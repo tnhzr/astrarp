@@ -100,13 +100,20 @@ public final class NamesModule implements AstraModule {
     public boolean validate(String name) {
         int min = plugin.configs().names().getInt("validation.min_length", 2);
         int max = plugin.configs().names().getInt("validation.max_length", 32);
-        boolean requireSpace = plugin.configs().names().getBoolean("validation.require_space", true);
+        int minWords = plugin.configs().names().getInt("validation.min_words", 1);
+        int maxWords = plugin.configs().names().getInt("validation.max_words", 2);
+        // Backwards compat: if the legacy require_space flag is still set,
+        // bump the minimum word count to two so single-word names are rejected.
+        if (plugin.configs().names().getBoolean("validation.require_space", false)) {
+            minWords = Math.max(minWords, 2);
+        }
         String pattern = plugin.configs().names().getString("validation.regex",
-                "^[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё'\\- ]+$");
+                "^[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё'\\-]*( [A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё'\\-]*)*$");
         if (name == null) return false;
         String trimmed = name.trim();
         if (trimmed.length() < min || trimmed.length() > max) return false;
-        if (requireSpace && !trimmed.contains(" ")) return false;
+        int words = trimmed.split("\\s+").length;
+        if (words < minWords || words > maxWords) return false;
         try {
             return trimmed.matches(pattern);
         } catch (Exception ex) {

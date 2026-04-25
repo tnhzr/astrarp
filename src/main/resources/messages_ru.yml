@@ -23,12 +23,13 @@ status:
   admin_nrp_off: "<gray>Игроку <yellow>{player}</yellow> снят NRP-статус."
 
 names:
-  usage_self: "<gray>Использование: <yellow>/rpname set \"<имя фамилия>\""
-  usage_admin: "<gray>Использование: <yellow>/rpaname <ник> set \"<имя фамилия>\""
-  invalid: "<red>Неверный формат имени. Должно быть Имя Фамилия (мин. 2 буквы каждое)."
+  usage_self: "<gray>Использование: <yellow>/rpname set \"<имя>\" или \"<имя фамилия>\""
+  usage_admin: "<gray>Использование: <yellow>/rpaname <ник> set \"<имя>\" или \"<имя фамилия>\""
+  invalid: "<red>Неверный формат имени. Допустимо одно или два слова, мин. 2 буквы каждое."
   cooldown: "<red>Подожди ещё <yellow>{seconds}s</yellow> до следующей смены имени."
   set_self: "<green>РП-имя установлено: <gold>{name}</gold>."
   set_admin: "<green>РП-имя игрока <yellow>{player}</yellow> теперь <gold>{name}</gold>."
+  notify_unset: "<yellow>У вас не задано РП-имя. Установите его командой <gold>/rpname set \"Имя\"</gold> или <gold>/rpname set \"Имя Фамилия\"</gold>."
 
 keepinv:
   kept: "<aqua>Ваши вещи сохранены."

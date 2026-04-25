@@ -2,6 +2,33 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2] — 2026-04-25
+
+### Fixed
+
+- `Text#parse` no longer round-trips through the legacy serializer, which had
+  been escaping every MiniMessage tag in the prefix and message bodies. As a
+  result `<gradient>`, `<red>`, `<yellow>`, etc. now render correctly in chat
+  and on the console instead of leaking as raw text.
+- Editor chat capture in `/rpc create` and `/rpc edit` no longer loses the
+  player's input under FlectonePulse. The chat listener now fires at
+  `LOWEST` with `ignoreCancelled=false`, drains the recipient set and also
+  intercepts the legacy `AsyncPlayerChatEvent` so other chat plugins cannot
+  re-broadcast or pre-empt the editor flow.
+
+### Changed
+
+- RP names accept one or two words instead of requiring «Имя Фамилия». Word
+  bounds are configurable via `validation.min_words` / `validation.max_words`
+  in `modules/names.yml` (defaults 1 and 2). Legacy `validation.require_space`
+  is still honored as a fallback.
+
+### Added
+
+- `notify_unset` block in `modules/names.yml` and `names.notify_unset` message
+  key — players without an RP name are reminded on join with a configurable
+  message and delay.
+
 ## [1.0.1] — 2026-04-25
 
 ### Fixed

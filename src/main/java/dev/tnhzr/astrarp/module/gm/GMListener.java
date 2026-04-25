@@ -118,7 +118,7 @@ public final class GMListener implements Listener {
                 java.util.Map.of("field", field.name().toLowerCase()));
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onChat(AsyncChatEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         RpcEditSessions.Pending pending = module.sessions().awaiting(uuid);
@@ -126,6 +126,23 @@ public final class GMListener implements Listener {
 
         String text = PlainTextComponentSerializer.plainText().serialize(event.message());
         event.setCancelled(true);
+        // Empty the recipient set so chat plugins running at MONITOR/HIGHEST cannot
+        // resurrect the message (FlectonePulse re-broadcasts cancelled events).
+        try { event.viewers().clear(); } catch (Throwable ignored) {}
+
+        plugin.getServer().getScheduler().runTask(plugin, () -> applyValue(event.getPlayer(), pending, text));
+    }
+
+    @SuppressWarnings("deprecation")
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+    public void onLegacyChat(org.bukkit.event.player.AsyncPlayerChatEvent event) {
+        UUID uuid = event.getPlayer().getUniqueId();
+        RpcEditSessions.Pending pending = module.sessions().awaiting(uuid);
+        if (pending == null) return;
+
+        String text = event.getMessage();
+        event.setCancelled(true);
+        try { event.getRecipients().clear(); } catch (Throwable ignored) {}
 
         plugin.getServer().getScheduler().runTask(plugin, () -> applyValue(event.getPlayer(), pending, text));
     }
