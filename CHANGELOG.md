@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3] — 2026-04-25
+
+### Fixed
+
+- PlaceholderAPI registration is now resilient: the expansion is unregistered
+  before re-register so `/papi reload` and `/astrarp reload` cycles do not
+  leave a stale instance behind. The boolean result of `register()` is
+  logged so a silent failure is visible in startup output.
+
+### Added
+
+- Direct TAB integration via TAB-API. `%astrarp_rpname%`,
+  `%astrarp_rpname_raw%`, `%astrarp_status%`, `%astrarp_status_raw%` are
+  registered with TAB's `PlaceholderManager`, so `customtabname` /
+  `customtagname` / `tabprefix` resolve them even on servers that do not
+  run PlaceholderAPI alongside TAB.
+- `/astrarp debug [player]` (permission `astrarp.admin.reload`) — prints
+  detected integrations and the resolved values of every AstraRP
+  placeholder for the target. If PlaceholderAPI is present it also runs
+  `PlaceholderAPI#setPlaceholders` so the output reflects what other
+  plugins would see.
+- README now documents the FlectonePulse `name.display` template that
+  must point at `%astrarp_rpname%` to actually replace the chat name, and
+  the TAB group block that uses the new placeholders.
+
 ## [1.0.2] — 2026-04-25
 
 ### Fixed
