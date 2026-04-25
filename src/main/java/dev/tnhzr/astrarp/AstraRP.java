@@ -12,6 +12,7 @@ import dev.tnhzr.astrarp.module.names.NamesModule;
 import dev.tnhzr.astrarp.module.status.StatusModule;
 import dev.tnhzr.astrarp.placeholder.AstraPlaceholders;
 import dev.tnhzr.astrarp.storage.Database;
+import dev.tnhzr.astrarp.util.Banner;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -78,7 +79,11 @@ public final class AstraRP extends JavaPlugin {
             getLogger().info("Hooked PlaceholderAPI.");
         }
 
-        getLogger().info("AstraRP v" + getDescription().getVersion() + " enabled.");
+        if (configManager.root().getBoolean("banner.enabled", true)) {
+            Banner.print(this);
+        } else {
+            getLogger().info("AstraRP v" + getDescription().getVersion() + " enabled.");
+        }
     }
 
     @Override

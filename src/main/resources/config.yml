@@ -10,3 +10,7 @@ prefix: "<gradient:#9d4edd:#3a86ff>[AstraRP]</gradient> "
 
 # Включить отладочный вывод в консоль.
 debug: false
+
+banner:
+  # Печатать ASCII-баннер AstraRP в консоли при запуске сервера.
+  enabled: true
