@@ -1,0 +1,80 @@
+name: AstraRP
+version: '${project.version}'
+main: dev.tnhzr.astrarp.AstraRP
+api-version: '1.21'
+authors: [tnhzr]
+description: Modular RolePlay toolkit for Paper 1.21.8
+website: https://github.com/tnhzr/astrarp
+
+dependencies:
+  server:
+    PlaceholderAPI:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    LuckPerms:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    FlectonePulse:
+      load: BEFORE
+      required: false
+      join-classpath: true
+    TAB:
+      load: BEFORE
+      required: false
+      join-classpath: true
+
+commands:
+  astrarp:
+    description: Главная команда AstraRP
+    aliases: [arp]
+    usage: /astrarp reload
+  rp:
+    description: Включить/выключить RP-статус
+    usage: /rp [игрок]
+  nrp:
+    description: Установить NRP-статус
+    usage: /nrp [игрок]
+  rpname:
+    description: Установить РП-имя
+    usage: /rpname set "<имя фамилия>"
+  rpaname:
+    description: Принудительно установить РП-имя игроку
+    usage: /rpaname <ник> set "<имя фамилия>"
+  feel:
+    description: Отправить ощущение/описание игроку
+    usage: /feel <ник|селектор> "<текст>"
+  rpc:
+    description: РП-персонажи (NPC голоса)
+    usage: /rpc create | /rpc show | /rpc <id> "<текст>" [радиус] [игрок]
+  infiniteitemframe:
+    description: Управление бесконечными рамками
+    aliases: [ifr]
+    usage: /ifr | /ifr del | /ifr reset local|global | /ifr check
+
+permissions:
+  astrarp.admin.reload:
+    description: Перезагрузка плагина
+    default: op
+  astrarp.status.use:
+    description: Команды /rp и /nrp для себя
+    default: true
+  astrarp.status.admin:
+    description: Смена статуса другим игрокам
+    default: op
+  astrarp.name.set:
+    description: Установка собственного РП-имени
+    default: true
+  astrarp.name.admin:
+    description: Принудительная смена РП-имени и игнор кулдауна
+    default: op
+  astrarp.feel.use:
+    description: Отправка /feel
+    default: op
+  astrarp.rpc.use:
+    description: Использование РП-персонажей
+    default: op
+  astrarp.ifr.admin:
+    description: Управление бесконечными рамками
+    default: op

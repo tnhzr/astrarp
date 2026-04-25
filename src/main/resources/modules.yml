@@ -1,0 +1,14 @@
+# ===============================================
+#  AstraRP — переключатели модулей
+# ===============================================
+modules:
+  status:
+    enabled: true
+  names:
+    enabled: true
+  keepinventory:
+    enabled: true
+  frames:
+    enabled: true
+  gm:
+    enabled: true

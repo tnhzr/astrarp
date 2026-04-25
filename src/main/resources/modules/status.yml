@@ -1,0 +1,21 @@
+# ===============================================
+#  Модуль 1: RP-статусы
+# ===============================================
+
+# Иконки статусов в формате MiniMessage. Используются в плейсхолдере %astrarp_status%.
+# Можно подставить кастомные глифы из ресурс-пака, например \uE001.
+icons:
+  rp: "<green><b>RP</b></green>"
+  nrp: "<red><b>NRP</b></red>"
+  none: ""
+
+# Сырое текстовое значение статуса (для %astrarp_status_raw%, FlectonePulse, TAB).
+raw:
+  rp: "RP"
+  nrp: "NRP"
+  none: ""
+
+luckperms:
+  # Записывать значение статуса в LuckPerms-мету игрока.
+  write_meta: true
+  meta_key: "astrarp_status"

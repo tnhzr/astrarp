@@ -1,0 +1,76 @@
+# ===============================================
+#  AstraRP — English messages (MiniMessage)
+# ===============================================
+
+common:
+  no_permission: "<red>You do not have permission."
+  players_only: "<red>This command is for players only."
+  player_not_found: "<red>Player <yellow>{player}</yellow> not found."
+
+core:
+  about: "<gray>AstraRP — modular RP toolkit. <yellow>/astrarp reload</yellow>"
+  usage: "<gray>Usage: <yellow>/astrarp reload"
+  reloaded: "<green>Configuration and modules reloaded."
+
+status:
+  self_rp_on: "<green>Your status is now <bold>RP</bold>."
+  self_rp_off: "<gray>RP status removed."
+  self_nrp_on: "<red>Your status is now <bold>NRP</bold>."
+  self_nrp_off: "<gray>NRP status removed."
+  admin_rp_on: "<green><yellow>{player}</yellow> is now <bold>RP</bold>."
+  admin_rp_off: "<gray><yellow>{player}</yellow> RP status removed."
+  admin_nrp_on: "<red><yellow>{player}</yellow> is now <bold>NRP</bold>."
+  admin_nrp_off: "<gray><yellow>{player}</yellow> NRP status removed."
+
+names:
+  usage_self: "<gray>Usage: <yellow>/rpname set \"<First Last>\""
+  usage_admin: "<gray>Usage: <yellow>/rpaname <player> set \"<First Last>\""
+  invalid: "<red>Invalid name format. Use First Last (each at least 2 letters)."
+  cooldown: "<red>Wait <yellow>{seconds}s</yellow> before changing your RP name again."
+  set_self: "<green>RP name set: <gold>{name}</gold>."
+  set_admin: "<green><yellow>{player}</yellow>'s RP name is now <gold>{name}</gold>."
+
+keepinv:
+  kept: "<aqua>Your items were preserved."
+  dropped: "<red>Your items dropped on death."
+
+frames:
+  usage: "<gray>Usage: <yellow>/ifr | /ifr del | /ifr reset local|global | /ifr check"
+  usage_reset: "<gray>Usage: <yellow>/ifr reset local [player] | /ifr reset global"
+  mode_create: "<green>Create mode. Right-click a filled item frame."
+  mode_delete: "<green>Delete mode. Right-click an infinite frame."
+  mode_check: "<green>Check mode. Right-click an infinite frame."
+  mode_reset_local: "<green>Reset mode. Right-click an infinite frame."
+  reset_global_confirm: "<yellow>Confirm global reset with <bold>/ifr confirm</bold> within 30 seconds."
+  reset_global_done: "<green>All infinite frame limits cleared."
+  reset_global_no_pending: "<red>No pending global reset to confirm."
+  reset_local_all: "<green>This frame's takers list cleared."
+  reset_local_player: "<green>This frame's limit cleared for <yellow>{player}</yellow>."
+  created: "<green>Frame marked as infinite."
+  deleted: "<green>Frame returned to vanilla."
+  create_empty: "<red>The frame has no item."
+  already_infinite: "<red>This frame is already infinite."
+  not_infinite: "<red>This frame is not infinite."
+  takers_empty: "<gray>Nobody has taken from this frame yet."
+  takers_list: "<gray>Took (<yellow>{count}</yellow>): <white>{players}</white>"
+  given: "<green>Item received."
+  given_dropped: "<yellow>Inventory full — item dropped at your feet."
+  already_taken: "<red>You have already taken an item from this frame."
+  empty_storage: "<red>Frame storage is empty. Notify an admin."
+
+gm:
+  feel_usage: "<gray>Usage: <yellow>/feel <player|selector> \"<text>\""
+  feel_sent: "<green>Message sent (<yellow>{count}</yellow>)."
+  rpc_usage: "<gray>Usage: <yellow>/rpc <id> \"<text>\" [radius] [player]"
+  rpc_not_found: "<red>Character <yellow>{id}</yellow> not found."
+  rpc_list: "<gray>Characters: <yellow>{count}</yellow> — <white>{ids}</white>"
+  rpc_sent_local: "<green>Sent locally (<yellow>{count}</yellow> nearby)."
+  rpc_sent_global: "<green>Sent to everyone (<yellow>{count}</yellow>)."
+  rpc_sent_private: "<green>Sent privately to <yellow>{player}</yellow>."
+  rpc_enter_value: "<aqua>Type the new value for <yellow>{field}</yellow> in chat. Type <yellow>cancel</yellow> to abort."
+  rpc_invalid_number: "<red>Number required."
+  rpc_id_required: "<red>Character id cannot be empty."
+  rpc_saved: "<green>Character <yellow>{id}</yellow> saved."
+  rpc_cancelled: "<gray>Editing cancelled."
+  rpc_deleted: "<gray>Character <yellow>{id}</yellow> deleted."
+  rpc_delete_hint: "<gray>Shift + right-click to delete the character."

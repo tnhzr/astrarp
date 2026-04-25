@@ -1,0 +1,14 @@
+target/
+*.class
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+.gradle/
+build/
+out/
+dependency-reduced-pom.xml
+*.log
+.DS_Store

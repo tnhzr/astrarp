@@ -1,0 +1,76 @@
+# ===============================================
+#  AstraRP — русские сообщения (MiniMessage)
+# ===============================================
+
+common:
+  no_permission: "<red>Недостаточно прав."
+  players_only: "<red>Эта команда доступна только игрокам."
+  player_not_found: "<red>Игрок <yellow>{player}</yellow> не найден."
+
+core:
+  about: "<gray>AstraRP — модульный РП-инструментарий. <yellow>/astrarp reload</yellow>"
+  usage: "<gray>Использование: <yellow>/astrarp reload"
+  reloaded: "<green>Конфигурация и модули перезагружены."
+
+status:
+  self_rp_on: "<green>Ваш статус установлен на <bold>RP</bold>."
+  self_rp_off: "<gray>RP-статус снят."
+  self_nrp_on: "<red>Ваш статус установлен на <bold>NRP</bold>."
+  self_nrp_off: "<gray>NRP-статус снят."
+  admin_rp_on: "<green>Игроку <yellow>{player}</yellow> установлен статус <bold>RP</bold>."
+  admin_rp_off: "<gray>Игроку <yellow>{player}</yellow> снят RP-статус."
+  admin_nrp_on: "<red>Игроку <yellow>{player}</yellow> установлен статус <bold>NRP</bold>."
+  admin_nrp_off: "<gray>Игроку <yellow>{player}</yellow> снят NRP-статус."
+
+names:
+  usage_self: "<gray>Использование: <yellow>/rpname set \"<имя фамилия>\""
+  usage_admin: "<gray>Использование: <yellow>/rpaname <ник> set \"<имя фамилия>\""
+  invalid: "<red>Неверный формат имени. Должно быть Имя Фамилия (мин. 2 буквы каждое)."
+  cooldown: "<red>Подожди ещё <yellow>{seconds}s</yellow> до следующей смены имени."
+  set_self: "<green>РП-имя установлено: <gold>{name}</gold>."
+  set_admin: "<green>РП-имя игрока <yellow>{player}</yellow> теперь <gold>{name}</gold>."
+
+keepinv:
+  kept: "<aqua>Ваши вещи сохранены."
+  dropped: "<red>Ваши вещи выпали на месте смерти."
+
+frames:
+  usage: "<gray>Использование: <yellow>/ifr | /ifr del | /ifr reset local|global | /ifr check"
+  usage_reset: "<gray>Использование: <yellow>/ifr reset local [ник] | /ifr reset global"
+  mode_create: "<green>Режим создания. Кликни ПКМ по заполненной рамке."
+  mode_delete: "<green>Режим удаления. Кликни ПКМ по бесконечной рамке."
+  mode_check: "<green>Режим проверки. Кликни ПКМ по бесконечной рамке."
+  mode_reset_local: "<green>Режим сброса. Кликни ПКМ по бесконечной рамке."
+  reset_global_confirm: "<yellow>Подтверди глобальный сброс командой <bold>/ifr confirm</bold> в течение 30 секунд."
+  reset_global_done: "<green>Все ограничения по бесконечным рамкам сброшены."
+  reset_global_no_pending: "<red>Нет ожидающего подтверждения глобального сброса."
+  reset_local_all: "<green>Лимиты на этой рамке сброшены для всех игроков."
+  reset_local_player: "<green>Лимит на этой рамке сброшен для игрока <yellow>{player}</yellow>."
+  created: "<green>Рамка отмечена как бесконечная."
+  deleted: "<green>Рамка возвращена в обычный режим."
+  create_empty: "<red>В рамке нет предмета."
+  already_infinite: "<red>Эта рамка уже является бесконечной."
+  not_infinite: "<red>Эта рамка не является бесконечной."
+  takers_empty: "<gray>Никто ещё не забирал из этой рамки."
+  takers_list: "<gray>Забрали (<yellow>{count}</yellow>): <white>{players}</white>"
+  given: "<green>Предмет получен."
+  given_dropped: "<yellow>Инвентарь полон — предмет выпал у ваших ног."
+  already_taken: "<red>Вы уже забирали предмет из этой рамки."
+  empty_storage: "<red>Хранилище предмета этой рамки пусто. Сообщите администратору."
+
+gm:
+  feel_usage: "<gray>Использование: <yellow>/feel <ник|селектор> \"<текст>\""
+  feel_sent: "<green>Сообщение отправлено (<yellow>{count}</yellow>)."
+  rpc_usage: "<gray>Использование: <yellow>/rpc <id> \"<текст>\" [радиус] [игрок]"
+  rpc_not_found: "<red>Персонаж <yellow>{id}</yellow> не найден."
+  rpc_list: "<gray>Персонажей: <yellow>{count}</yellow> — <white>{ids}</white>"
+  rpc_sent_local: "<green>Реплика отправлена (<yellow>{count}</yellow> поблизости)."
+  rpc_sent_global: "<green>Реплика отправлена всем (<yellow>{count}</yellow>)."
+  rpc_sent_private: "<green>Реплика отправлена приватно <yellow>{player}</yellow>."
+  rpc_enter_value: "<aqua>Введите новое значение поля <yellow>{field}</yellow> в чат. Напишите <yellow>отмена</yellow> чтобы выйти."
+  rpc_invalid_number: "<red>Нужно целое число."
+  rpc_id_required: "<red>ID персонажа не может быть пустым."
+  rpc_saved: "<green>Персонаж <yellow>{id}</yellow> сохранён."
+  rpc_cancelled: "<gray>Создание/правка отменены."
+  rpc_deleted: "<gray>Персонаж <yellow>{id}</yellow> удалён."
+  rpc_delete_hint: "<gray>Shift+ПКМ — удалить персонажа."
