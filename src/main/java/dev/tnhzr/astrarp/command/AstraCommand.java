@@ -61,10 +61,23 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
     private void runDebug(CommandSender sender, String[] args) {
         OfflinePlayer target = null;
         if (args.length >= 2) {
-            target = Bukkit.getOfflinePlayerIfCached(args[1]);
-            if (target == null) target = Bukkit.getOfflinePlayer(args[1]);
+            // Resolve via the online roster first, then the cached offline list.
+            // Avoid Bukkit.getOfflinePlayer(String) — it blocks the main thread on
+            // a Mojang lookup when the name has never been seen on the server.
+            Player online = Bukkit.getPlayerExact(args[1]);
+            if (online != null) {
+                target = online;
+            } else {
+                target = Bukkit.getOfflinePlayerIfCached(args[1]);
+            }
         } else if (sender instanceof Player p) {
             target = p;
+        }
+
+        if (args.length >= 2 && target == null) {
+            sender.sendMessage(Component.text("No cached player named '" + args[1] +
+                    "' — log in once or pass an online nickname."));
+            return;
         }
 
         sender.sendMessage(Component.text("AstraRP debug ── integrations:"));
