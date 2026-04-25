@@ -12,6 +12,7 @@ public final class IntegrationRegistry {
     private boolean tab;
 
     private LuckPermsBridge luckPermsBridge;
+    private TabBridge tabBridge;
 
     public IntegrationRegistry(AstraRP plugin) {
         this.plugin = plugin;
@@ -35,6 +36,20 @@ public final class IntegrationRegistry {
         if (placeholderApi) plugin.getLogger().info("Detected PlaceholderAPI.");
         if (flectonePulse) plugin.getLogger().info("Detected FlectonePulse.");
         if (tab) plugin.getLogger().info("Detected TAB.");
+    }
+
+    /**
+     * Register TAB placeholders late, after every module is enabled, so the
+     * lookups can rely on the modules being initialised.
+     */
+    public void registerTabPlaceholders() {
+        if (!tab || tabBridge != null) return;
+        try {
+            tabBridge = new TabBridge(plugin);
+            tabBridge.register();
+        } catch (Throwable t) {
+            plugin.getLogger().warning("TAB bridge failed: " + t.getMessage());
+        }
     }
 
     public boolean hasLuckPerms() { return luckperms; }

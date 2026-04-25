@@ -75,9 +75,26 @@ public final class AstraRP extends JavaPlugin {
         }
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
-            new AstraPlaceholders(this).register();
-            getLogger().info("Hooked PlaceholderAPI.");
+            try {
+                AstraPlaceholders expansion = new AstraPlaceholders(this);
+                if (expansion.isRegistered()) {
+                    expansion.unregister();
+                }
+                boolean ok = expansion.register();
+                if (ok) {
+                    getLogger().info("Hooked PlaceholderAPI: %astrarp_*% placeholders are live.");
+                } else {
+                    getLogger().warning("PlaceholderAPI register() returned false. " +
+                            "Run /papi reload, then /papi parse <player> %astrarp_rpname% to debug.");
+                }
+            } catch (Throwable t) {
+                getLogger().warning("Failed to register PlaceholderAPI expansion: " + t.getMessage());
+            }
+        } else {
+            getLogger().info("PlaceholderAPI not present \u2014 %astrarp_*% placeholders unavailable to other plugins.");
         }
+
+        integrations.registerTabPlaceholders();
 
         if (configManager.root().getBoolean("banner.enabled", true)) {
             Banner.print(this);
