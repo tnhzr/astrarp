@@ -74,4 +74,62 @@ public final class StyleEdit {
         if (input == null) return "";
         return ANY_TAG.matcher(input).replaceAll("").trim();
     }
+
+    /**
+     * Returns the index in {@code palette} of the leading colour tag in
+     * {@code input}, or -1 if the input has no recognised leading colour or
+     * uses something exotic (gradient, rainbow, hex). Used by the colour
+     * cycler in the editor to advance to the next colour.
+     */
+    public static int currentColorIndex(String input, String[] palette) {
+        if (input == null || palette == null) return -1;
+        String s = input;
+        if (!s.startsWith("<")) return -1;
+        int close = s.indexOf('>');
+        if (close < 0) return -1;
+        String tag = s.substring(1, close);
+        for (int i = 0; i < palette.length; i++) {
+            if (palette[i].equals(tag)) return i;
+        }
+        return -1;
+    }
+
+    /**
+     * Advance the leading colour to the next entry in the palette, wrapping
+     * around. Direction +1 = next, -1 = previous. If the input has no
+     * recognised leading colour, the result starts at index 0 (next) or the
+     * last index (previous).
+     */
+    public static String cycleColor(String input, String[] palette, int direction) {
+        if (palette == null || palette.length == 0) return input;
+        int current = currentColorIndex(input, palette);
+        int next;
+        if (current < 0) {
+            next = direction >= 0 ? 0 : palette.length - 1;
+        } else {
+            next = ((current + direction) % palette.length + palette.length) % palette.length;
+        }
+        return applyColor(input, palette[next]);
+    }
+
+    /** True when {@code input} carries the given short MM tag (or its long form). */
+    public static boolean containsTag(String input, String tag) {
+        if (input == null) return false;
+        String low = input.toLowerCase();
+        String longName = switch (tag) {
+            case "b" -> "bold";
+            case "i" -> "italic";
+            case "u" -> "underlined";
+            case "st" -> "strikethrough";
+            case "obf" -> "obfuscated";
+            default -> tag;
+        };
+        return low.contains("<" + tag + ">") || low.contains("<" + longName + ">");
+    }
+
+    /** Strip the leading colour tag, leaving formatting and content intact. */
+    public static String clearColor(String input) {
+        if (input == null) return "";
+        return LEADING_COLOUR.matcher(input).replaceFirst("");
+    }
 }

@@ -3,6 +3,7 @@ package dev.tnhzr.astrarp;
 import dev.tnhzr.astrarp.command.AstraCommand;
 import dev.tnhzr.astrarp.config.ConfigManager;
 import dev.tnhzr.astrarp.config.MessageManager;
+import dev.tnhzr.astrarp.integration.ChatHeadsBridge;
 import dev.tnhzr.astrarp.integration.IntegrationRegistry;
 import dev.tnhzr.astrarp.module.ModuleManager;
 import dev.tnhzr.astrarp.module.frames.FramesModule;
@@ -98,6 +99,7 @@ public final class AstraRP extends JavaPlugin {
         }
 
         integrations.registerTabPlaceholders();
+        ChatHeadsBridge.register(this);
 
         if (configManager.root().getBoolean("banner.enabled", true)) {
             Banner.print(this);
