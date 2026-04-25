@@ -6,24 +6,7 @@ authors: [tnhzr]
 description: Modular RolePlay toolkit for Paper 1.21.8
 website: https://github.com/tnhzr/astrarp
 
-dependencies:
-  server:
-    PlaceholderAPI:
-      load: BEFORE
-      required: false
-      join-classpath: true
-    LuckPerms:
-      load: BEFORE
-      required: false
-      join-classpath: true
-    FlectonePulse:
-      load: BEFORE
-      required: false
-      join-classpath: true
-    TAB:
-      load: BEFORE
-      required: false
-      join-classpath: true
+softdepend: [PlaceholderAPI, LuckPerms, FlectonePulse, TAB]
 
 commands:
   astrarp:
