@@ -78,36 +78,98 @@ public final class GMListener implements Listener {
         RpcCharacter draft = module.sessions().draft(player.getUniqueId());
         if (draft == null) return;
         int slot = event.getRawSlot();
+        // Slots inside the player inventory are >= editor size (54).
+        if (slot >= 54) return;
 
-        switch (slot) {
-            case 10 -> startChat(player, draft, RpcEditSessions.Field.ID, true);
-            case 11 -> startChat(player, draft, RpcEditSessions.Field.DISPLAY_NAME, false);
-            case 12 -> startChat(player, draft, RpcEditSessions.Field.STYLE, false);
-            case 13 -> startChat(player, draft, RpcEditSessions.Field.ICON, false);
-            case 14 -> startChat(player, draft, RpcEditSessions.Field.RADIUS, false);
-            case 18 -> {
-                module.sessions().clear(player.getUniqueId());
-                player.closeInventory();
-                plugin.messages().send(player, "gm.rpc_cancelled");
-            }
-            case 22 -> {
-                if (draft.id() == null || draft.id().isBlank()) {
-                    plugin.messages().send(player, "gm.rpc_id_required");
-                    return;
-                }
-                module.repository().save(draft);
-                module.sessions().clear(player.getUniqueId());
-                player.closeInventory();
-                plugin.messages().send(player, "gm.rpc_saved", java.util.Map.of("id", draft.id()));
-            }
-            case 26 -> {
-                module.repository().delete(draft.id());
-                module.sessions().clear(player.getUniqueId());
-                player.closeInventory();
-                plugin.messages().send(player, "gm.rpc_deleted", java.util.Map.of("id", draft.id()));
-            }
-            default -> {}
+        // Field-edit clicks ────────────────────────────────────────────────
+        if (slot == RpcGui.SLOT_ID) { startChat(player, draft, RpcEditSessions.Field.ID, true); return; }
+        if (slot == RpcGui.SLOT_NAME) { startChat(player, draft, RpcEditSessions.Field.DISPLAY_NAME, false); return; }
+        if (slot == RpcGui.SLOT_STYLE) { startChat(player, draft, RpcEditSessions.Field.STYLE, false); return; }
+        if (slot == RpcGui.SLOT_ICON) { startChat(player, draft, RpcEditSessions.Field.ICON, false); return; }
+        if (slot == RpcGui.SLOT_RADIUS) { startChat(player, draft, RpcEditSessions.Field.RADIUS, false); return; }
+
+        // Action buttons ──────────────────────────────────────────────────
+        if (slot == RpcGui.SLOT_CANCEL) {
+            module.sessions().clear(player.getUniqueId());
+            player.closeInventory();
+            plugin.messages().send(player, "gm.rpc_cancelled");
+            return;
         }
+        if (slot == RpcGui.SLOT_SAVE) {
+            if (draft.id() == null || draft.id().isBlank()) {
+                plugin.messages().send(player, "gm.rpc_id_required");
+                return;
+            }
+            module.repository().save(draft);
+            module.sessions().clear(player.getUniqueId());
+            player.closeInventory();
+            plugin.messages().send(player, "gm.rpc_saved", java.util.Map.of("id", draft.id()));
+            return;
+        }
+        if (slot == RpcGui.SLOT_DELETE) {
+            module.repository().delete(draft.id());
+            module.sessions().clear(player.getUniqueId());
+            player.closeInventory();
+            plugin.messages().send(player, "gm.rpc_deleted", java.util.Map.of("id", draft.id()));
+            return;
+        }
+
+        // Format toggles ──────────────────────────────────────────────────
+        if (slot == RpcGui.SLOT_NAME_BOLD) {
+            draft.setDisplayName(StyleEdit.toggleTag(draft.displayName(), "b"));
+            redrawEditor(player, draft);
+            return;
+        }
+        if (slot == RpcGui.SLOT_NAME_ITALIC) {
+            draft.setDisplayName(StyleEdit.toggleTag(draft.displayName(), "i"));
+            redrawEditor(player, draft);
+            return;
+        }
+        if (slot == RpcGui.SLOT_STYLE_BOLD) {
+            draft.setStyle(StyleEdit.toggleTag(draft.style(), "b"));
+            redrawEditor(player, draft);
+            return;
+        }
+        if (slot == RpcGui.SLOT_STYLE_ITALIC) {
+            draft.setStyle(StyleEdit.toggleTag(draft.style(), "i"));
+            redrawEditor(player, draft);
+            return;
+        }
+        if (slot == RpcGui.SLOT_NAME_RESET) {
+            draft.setDisplayName(StyleEdit.stripFormatting(draft.displayName()));
+            redrawEditor(player, draft);
+            return;
+        }
+        if (slot == RpcGui.SLOT_STYLE_RESET) {
+            draft.setStyle(StyleEdit.stripFormatting(draft.style()));
+            redrawEditor(player, draft);
+            return;
+        }
+
+        // Colour palette ──────────────────────────────────────────────────
+        int idx = indexOf(RpcGui.NAME_COLOR_SLOTS, slot);
+        if (idx >= 0 && idx < RpcGui.COLOR_NAMES.length) {
+            draft.setDisplayName(StyleEdit.applyColor(draft.displayName(), RpcGui.COLOR_NAMES[idx]));
+            redrawEditor(player, draft);
+            return;
+        }
+        idx = indexOf(RpcGui.STYLE_COLOR_SLOTS, slot);
+        if (idx >= 0 && idx < RpcGui.COLOR_NAMES.length) {
+            draft.setStyle(StyleEdit.applyColor(draft.style(), RpcGui.COLOR_NAMES[idx]));
+            redrawEditor(player, draft);
+            return;
+        }
+    }
+
+    private static int indexOf(int[] arr, int v) {
+        for (int i = 0; i < arr.length; i++) if (arr[i] == v) return i;
+        return -1;
+    }
+
+    private void redrawEditor(Player player, RpcCharacter draft) {
+        // Re-open editor on the next tick so click event fully unwinds first.
+        plugin.getServer().getScheduler().runTask(plugin,
+                () -> module.gui().openEditor(player, draft, draft.id() == null || draft.id().isBlank()));
     }
 
     private void startChat(Player player, RpcCharacter draft, RpcEditSessions.Field field, boolean idChange) {

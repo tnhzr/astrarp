@@ -30,6 +30,17 @@ public final class RpcCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
                              @NotNull String label, @NotNull String[] args) {
+        if (args.length >= 1 && ("help".equalsIgnoreCase(args[0]) || "?".equals(args[0]))) {
+            plugin.messages().send(sender, "gm.rpc_help_header");
+            plugin.messages().send(sender, "gm.rpc_help_open");
+            plugin.messages().send(sender, "gm.rpc_help_create");
+            plugin.messages().send(sender, "gm.rpc_help_list");
+            plugin.messages().send(sender, "gm.rpc_help_delete");
+            plugin.messages().send(sender, "gm.rpc_help_speak");
+            plugin.messages().send(sender, "gm.rpc_help_help");
+            return true;
+        }
+
         if (!sender.hasPermission("astrarp.rpc.use")) {
             plugin.messages().send(sender, "common.no_permission");
             return true;
@@ -136,7 +147,7 @@ public final class RpcCommand implements CommandExecutor, TabCompleter {
                            Integer radiusOverride, String privatePlayer) {
         int radius = radiusOverride == null ? character.radius() : radiusOverride;
         String format = plugin.configs().gm().getString("rpc.format",
-                "<gold>[ <reset>{name}<gold> ]</gold> {style}{text}");
+                "{name} {style}{text}");
         Component message = Text.parse(format, Map.of(
                 "name", character.displayName(),
                 "style", character.style() == null ? "" : character.style(),

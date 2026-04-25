@@ -16,7 +16,15 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class StatusModule implements AstraModule {
 
     public enum RpStatus {
-        NONE, RP, NRP
+        /**
+         * Legacy "off" state. Kept in the enum so old database rows still
+         * deserialize, but new commands never set it: every player ends up
+         * either {@link #RP} or {@link #NRP}.
+         */
+        @Deprecated
+        NONE,
+        RP,
+        NRP
     }
 
     private final AstraRP plugin;
@@ -64,7 +72,18 @@ public final class StatusModule implements AstraModule {
     }
 
     public RpStatus get(UUID uuid) {
-        return cache.getOrDefault(uuid, RpStatus.NONE);
+        // Default state is NRP; we no longer expose NONE to commands.
+        // Legacy NONE rows from older versions are migrated lazily on first read.
+        RpStatus current = cache.get(uuid);
+        if (current == null || current == RpStatus.NONE) {
+            return RpStatus.NRP;
+        }
+        return current;
+    }
+
+    public boolean has(UUID uuid) {
+        RpStatus current = cache.get(uuid);
+        return current != null && current != RpStatus.NONE;
     }
 
     public void set(UUID uuid, RpStatus status) {
@@ -84,16 +103,24 @@ public final class StatusModule implements AstraModule {
         if (p != null) applyDisplay(p);
     }
 
+    /**
+     * Toggle RP: if already RP, switch to NRP; otherwise switch to RP. Never
+     * sets NONE — there is no "off" state any more.
+     */
     public RpStatus toggleRp(UUID uuid) {
         RpStatus current = get(uuid);
-        RpStatus next = current == RpStatus.RP ? RpStatus.NONE : RpStatus.RP;
+        RpStatus next = current == RpStatus.RP ? RpStatus.NRP : RpStatus.RP;
         set(uuid, next);
         return next;
     }
 
+    /**
+     * Toggle NRP: if already NRP, switch to RP; otherwise switch to NRP.
+     * Never sets NONE.
+     */
     public RpStatus toggleNrp(UUID uuid) {
         RpStatus current = get(uuid);
-        RpStatus next = current == RpStatus.NRP ? RpStatus.NONE : RpStatus.NRP;
+        RpStatus next = current == RpStatus.NRP ? RpStatus.RP : RpStatus.NRP;
         set(uuid, next);
         return next;
     }

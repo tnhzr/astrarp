@@ -49,6 +49,9 @@ permissions:
   astrarp.name.set:
     description: Установка собственного РП-имени
     default: true
+  astrarp.name.find:
+    description: Поиск РП-имени по нику и обратно
+    default: true
   astrarp.name.admin:
     description: Принудительная смена РП-имени и игнор кулдауна
     default: op

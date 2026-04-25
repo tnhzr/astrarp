@@ -10,7 +10,7 @@ public final class RpcCharacter {
     public RpcCharacter(String id, String displayName, String style, String icon, int radius) {
         this.id = id;
         this.displayName = displayName == null ? id : displayName;
-        this.style = style == null ? "<gray><i>" : style;
+        this.style = style == null ? "" : style;
         this.icon = icon;
         this.radius = radius <= 0 ? 32 : radius;
     }

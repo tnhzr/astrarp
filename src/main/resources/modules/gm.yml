@@ -10,7 +10,8 @@ rpc:
   # Формат сообщений /rpc <id> "text".
   # Плейсхолдеры: {name} — отображаемое имя NPC, {style} — настроенный стиль,
   # {text} — реплика.
-  format: "<gold>[ <reset>{name}<gold> ]</gold> {style}{text}"
+  # По умолчанию плагин не оборачивает имя в скобки — добавляйте свои в displayName, например "<gold>[ <reset><red>Гриффит<gold> ]"
+  format: "{name} {style}{text}"
 
 # Текст в превью при создании персонажа (отображается в GUI).
 preview_text: "Привет, путник."
