@@ -76,11 +76,14 @@ public final class AstraRP extends JavaPlugin {
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             try {
-                AstraPlaceholders expansion = new AstraPlaceholders(this);
-                if (expansion.isRegistered()) {
-                    expansion.unregister();
+                me.clip.placeholderapi.expansion.PlaceholderExpansion existing =
+                        me.clip.placeholderapi.PlaceholderAPIPlugin.getInstance()
+                                .getLocalExpansionManager()
+                                .getExpansion("astrarp");
+                if (existing != null) {
+                    existing.unregister();
                 }
-                boolean ok = expansion.register();
+                boolean ok = new AstraPlaceholders(this).register();
                 if (ok) {
                     getLogger().info("Hooked PlaceholderAPI: %astrarp_*% placeholders are live.");
                 } else {
