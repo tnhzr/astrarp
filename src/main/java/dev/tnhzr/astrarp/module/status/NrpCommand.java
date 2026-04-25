@@ -36,7 +36,7 @@ public final class NrpCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             StatusModule.RpStatus next = module.toggleNrp(player.getUniqueId());
-            String key = next == StatusModule.RpStatus.NRP ? "status.self_nrp_on" : "status.self_nrp_off";
+            String key = next == StatusModule.RpStatus.NRP ? "status.self_nrp_on" : "status.self_rp_on";
             plugin.messages().send(player, key);
             return true;
         }
@@ -53,7 +53,7 @@ public final class NrpCommand implements CommandExecutor, TabCompleter {
         }
 
         StatusModule.RpStatus next = module.toggleNrp(target.getUniqueId());
-        String key = next == StatusModule.RpStatus.NRP ? "status.admin_nrp_on" : "status.admin_nrp_off";
+        String key = next == StatusModule.RpStatus.NRP ? "status.admin_nrp_on" : "status.admin_rp_on";
         plugin.messages().send(sender, key, Map.of("player", target.getName()));
         plugin.messages().send(target, key.replace("admin", "self"));
         return true;

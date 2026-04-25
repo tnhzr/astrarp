@@ -12,17 +12,16 @@ apply:
   tab_list: true
   # MiniMessage-формат отображаемого имени. Поддерживаются плейсхолдеры
   # {rpname} и {player}.
-  format: "<gold>{rpname}</gold>"
+  format: "<gradient:#ffb000:#ffe167>{rpname}</gradient>"
 
 validation:
-  min_length: 2
+  min_length: 1
   max_length: 32
-  # Минимальное и максимальное количество слов в имени.
-  # min_words: 1, max_words: 2 → допустимо «Имя» или «Имя Фамилия».
-  min_words: 1
-  max_words: 2
-  # Разрешённые символы. По умолчанию — латиница, кириллица, апостроф и дефис.
-  regex: "^[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё'\\-]*( [A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё'\\-]*)*$"
+  # По умолчанию плагин запрещает только управляющие символы (newline, tab и т.п.),
+  # любые буквы/символы/эмодзи/пробелы разрешены.
+  # Если хочешь жёстче — задай regex (опционально), пример:
+  #   regex: "^[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё'\\- ]*$"
+  regex: ""
 
 luckperms:
   write_meta: true

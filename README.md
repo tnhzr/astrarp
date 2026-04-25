@@ -157,6 +157,31 @@ groups:
 
 `customtabname`/`customtagname` определяют, что увидит игрок в табе и над головой соответственно. Если AstraRP запущен без TAB, плейсхолдеры всё равно доступны через PlaceholderAPI (`%astrarp_rpname%` и т. д.).
 
+### ChatHeads (мод на клиенте)
+
+[ChatHeads](https://modrinth.com/mod/chat-heads) рисует голову отправителя рядом с его сообщениями. Когда чат идёт через FlectonePulse + AstraRP, мод теряет автора, потому что плагин шлёт сообщение от лица сервера, а не от игрока.
+
+Чтобы мод снова находил автора:
+
+1. **На клиенте.** В `config/chat_heads.json5` поставь:
+   ```json5
+   senderDetection: "HEURISTIC_AND_UUID",
+   ```
+   `HEURISTIC_ONLY` — крайний вариант, если UUID-детект мешает.
+
+2. **На сервере (FlectonePulse).** Шаблон `name.display` обязан содержать настоящий ник игрока внутри click-action. ChatHeads ищет паттерн `/msg|/tell|/w|/whisper <username>`. Стандартный шаблон уже подходит — главное **не убирать** `/msg <player>` из click:
+
+   ```yaml
+   message:
+     format:
+       name_:
+         display: "<click:suggest_command:'/msg <player>'>...<fcolor:2>%astrarp_rpname%<afk_suffix></hover></click>"
+   ```
+
+   `%astrarp_rpname%` идёт в видимый текст, `<player>` остаётся внутри `/msg ...` — так у мода есть зацепка для головы, а игрок видит РП-имя.
+
+3. **Если голов всё равно нет** — обнови ChatHeads до последней версии и проверь, что у тебя включена UUID-подпись чата на сервере (`paper-global.yml → packet-events: enabled` или `online-mode: true`).
+
 ### LuckPerms meta-bridge (опционально)
 
 Если хочется собирать имя через мету LuckPerms (например, для совместимости со старыми шаблонами), включите `luckperms.write_meta: true` в `modules/names.yml` — AstraRP запишет ключ `astrarp_rpname` в LuckPerms-мету игрока, и его можно использовать как `%luckperms_meta_astrarp_rpname%`.

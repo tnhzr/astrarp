@@ -25,6 +25,17 @@ public final class IfrCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command,
                              @NotNull String label, @NotNull String[] args) {
+        if (args.length >= 1 && ("help".equalsIgnoreCase(args[0]) || "?".equals(args[0]))) {
+            plugin.messages().send(sender, "frames.help_header");
+            plugin.messages().send(sender, "frames.help_create");
+            plugin.messages().send(sender, "frames.help_del");
+            plugin.messages().send(sender, "frames.help_check");
+            plugin.messages().send(sender, "frames.help_reset");
+            plugin.messages().send(sender, "frames.help_confirm");
+            plugin.messages().send(sender, "frames.help_help");
+            return true;
+        }
+
         if (!sender.hasPermission("astrarp.ifr.admin")) {
             plugin.messages().send(sender, "common.no_permission");
             return true;
@@ -90,10 +101,15 @@ public final class IfrCommand implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
                                       @NotNull String alias, @NotNull String[] args) {
-        if (!sender.hasPermission("astrarp.ifr.admin")) return List.of();
         if (args.length == 1) {
-            return List.of("del", "reset", "check", "confirm");
+            List<String> all = new ArrayList<>(List.of("del", "reset", "check", "confirm", "help"));
+            List<String> out = new ArrayList<>();
+            for (String s : all) {
+                if (s.startsWith(args[0].toLowerCase())) out.add(s);
+            }
+            return out;
         }
+        if (!sender.hasPermission("astrarp.ifr.admin")) return List.of();
         if (args.length == 2 && args[0].equalsIgnoreCase("reset")) {
             return List.of("local", "global");
         }

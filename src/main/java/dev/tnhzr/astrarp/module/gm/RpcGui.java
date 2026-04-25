@@ -28,6 +28,48 @@ public final class RpcGui {
     public static final String LIST_TITLE = "AstraRP::rpc_list";
     public static final String EDIT_TITLE = "AstraRP::rpc_edit";
 
+    /** Slot map for the editor inventory. Public so listener stays in sync. */
+    public static final int SLOT_ID = 1;
+    public static final int SLOT_NAME = 2;
+    public static final int SLOT_STYLE = 3;
+    public static final int SLOT_ICON = 4;
+    public static final int SLOT_RADIUS = 5;
+    public static final int SLOT_PREVIEW = 7;
+
+    public static final int SLOT_NAME_RESET = 26;
+    public static final int SLOT_STYLE_RESET = 44;
+
+    public static final int SLOT_NAME_BOLD = 24;
+    public static final int SLOT_NAME_ITALIC = 25;
+    public static final int SLOT_STYLE_BOLD = 42;
+    public static final int SLOT_STYLE_ITALIC = 43;
+
+    public static final int SLOT_CANCEL = 45;
+    public static final int SLOT_SAVE = 49;
+    public static final int SLOT_DELETE = 53;
+
+    /** Wool slots and their MiniMessage colour names for the NAME field. */
+    public static final int[] NAME_COLOR_SLOTS = {
+            9, 10, 11, 12, 13, 14, 15, 16, 17, // row 1: 9 colours
+            18, 19, 20, 21, 22, 23             // row 2: 6 colours + 2 toggle slots
+    };
+    public static final int[] STYLE_COLOR_SLOTS = {
+            27, 28, 29, 30, 31, 32, 33, 34, 35,
+            36, 37, 38, 39, 40, 41
+    };
+    public static final String[] COLOR_NAMES = {
+            "black", "dark_blue", "dark_green", "dark_aqua",
+            "dark_red", "dark_purple", "gold", "gray",
+            "dark_gray", "blue", "green", "aqua",
+            "red", "light_purple", "yellow"
+    };
+    public static final Material[] COLOR_WOOLS = {
+            Material.BLACK_WOOL, Material.BLUE_WOOL, Material.GREEN_WOOL, Material.CYAN_WOOL,
+            Material.RED_WOOL, Material.PURPLE_WOOL, Material.ORANGE_WOOL, Material.LIGHT_GRAY_WOOL,
+            Material.GRAY_WOOL, Material.LIGHT_BLUE_WOOL, Material.LIME_WOOL, Material.LIGHT_BLUE_WOOL,
+            Material.PINK_WOOL, Material.MAGENTA_WOOL, Material.YELLOW_WOOL
+    };
+
     private final AstraRP plugin;
     private final RpcRepository repository;
 
@@ -41,7 +83,7 @@ public final class RpcGui {
         int rows = Math.max(1, (int) Math.ceil(characters.size() / 9.0));
         int size = Math.min(54, Math.max(9, rows * 9));
         Inventory inv = Bukkit.createInventory(new RpcGuiHolder(LIST_TITLE),
-                size, Text.parse("<dark_purple>AstraRP — РП-персонажи</dark_purple>"));
+                size, Text.parse("<gradient:#ffb000:#ffe167><b>AstraRP — РП-персонажи</b></gradient>"));
 
         for (RpcCharacter ch : characters) {
             inv.addItem(buildHead(ch));
@@ -51,50 +93,108 @@ public final class RpcGui {
 
     public void openEditor(Player player, RpcCharacter draft, boolean isNew) {
         Inventory inv = Bukkit.createInventory(new RpcGuiHolder(EDIT_TITLE),
-                27, Text.parse(isNew
-                        ? "<dark_aqua>Создание персонажа</dark_aqua>"
-                        : "<dark_aqua>Редактирование: " + draft.id() + "</dark_aqua>"));
+                54, Text.parse(isNew
+                        ? "<gradient:#ffb000:#ffe167><b>Создание персонажа</b></gradient>"
+                        : "<gradient:#ffb000:#ffe167><b>Редактирование: " + draft.id() + "</b></gradient>"));
 
-        inv.setItem(10, simple(Material.NAME_TAG, "<gold>ID персонажа</gold>",
+        // ── Top row: main fields ───────────────────────────────────────────
+        inv.setItem(SLOT_ID, simple(Material.NAME_TAG, "<#ffda4a>ID персонажа</#ffda4a>",
                 List.of("<gray>Текущий: <white>" + draft.id() + "</white>",
                         "<dark_gray>Клик: ввести в чат")));
 
-        inv.setItem(11, simple(Material.PAPER, "<gold>Отображаемое имя</gold>",
-                List.of("<gray>Текущее: <white>" + draft.displayName() + "</white>",
-                        "<dark_gray>Клик: ввести в чат (MiniMessage / &-цвета)")));
+        inv.setItem(SLOT_NAME, simple(Material.PAPER, "<#ffda4a>Отображаемое имя</#ffda4a>",
+                List.of("<gray>Текущее: <white>" + escape(draft.displayName()) + "</white>",
+                        "<dark_gray>Клик: ввести в чат (MiniMessage / &-цвета)",
+                        "<dark_gray>Скобки и оформление — ниже кнопками.")));
 
-        inv.setItem(12, simple(Material.WRITABLE_BOOK, "<gold>Стиль текста</gold>",
-                List.of("<gray>Текущий: <white>" + draft.style() + "</white>",
-                        "<dark_gray>Пример: <gray><i> или <green><b>")));
+        inv.setItem(SLOT_STYLE, simple(Material.WRITABLE_BOOK, "<#ffda4a>Стиль текста реплик</#ffda4a>",
+                List.of("<gray>Текущий: <white>" + escape(draft.style()) + "</white>",
+                        "<dark_gray>Применяется к тексту /rpc <id> \"...\"")));
 
         ItemStack icon = buildIcon(draft);
         ItemMeta im = icon.getItemMeta();
         if (im != null) {
-            im.displayName(Text.parse("<gold>Иконка</gold>"));
+            im.displayName(Text.parse("<#ffda4a>Иконка</#ffda4a>"));
             List<Component> lore = new ArrayList<>();
             lore.add(Text.parse("<gray>Текущее: <white>" + (draft.icon() == null ? "—" : draft.icon()) + "</white>"));
             lore.add(Text.parse("<dark_gray>Клик: ник игрока или Base64"));
             im.lore(lore);
             icon.setItemMeta(im);
         }
-        inv.setItem(13, icon);
+        inv.setItem(SLOT_ICON, icon);
 
-        inv.setItem(14, simple(Material.SPYGLASS, "<gold>Радиус слышимости</gold>",
+        inv.setItem(SLOT_RADIUS, simple(Material.SPYGLASS, "<#ffda4a>Радиус слышимости</#ffda4a>",
                 List.of("<gray>Текущий: <white>" + draft.radius() + "</white>",
                         "<dark_gray>Клик: ввести число")));
 
-        inv.setItem(15, simple(Material.BOOK, "<aqua>Превью</aqua>",
+        inv.setItem(SLOT_PREVIEW, simple(Material.BOOK, "<aqua>Превью</aqua>",
                 List.of("<gray>" + previewLine(draft))));
 
-        inv.setItem(22, simple(Material.LIME_CONCRETE, "<green>Сохранить</green>",
-                List.of("<gray>Записывает персонажа.")));
-        inv.setItem(18, simple(Material.RED_CONCRETE, "<red>Отмена</red>",
+        // ── NAME colour palette + B/I + reset ──────────────────────────────
+        for (int i = 0; i < COLOR_NAMES.length; i++) {
+            int slot = NAME_COLOR_SLOTS[i];
+            inv.setItem(slot, colorButton(COLOR_NAMES[i], COLOR_WOOLS[i], "имя"));
+        }
+        inv.setItem(SLOT_NAME_BOLD, simple(Material.GOLDEN_APPLE,
+                "<#ffda4a>Имя — <b>Жирный</b></#ffda4a>",
+                List.of("<dark_gray>Включает/выключает <b>",
+                        "<dark_gray>Текущее: " + (containsTag(draft.displayName(), "b") ? "<green>да" : "<red>нет"))));
+        inv.setItem(SLOT_NAME_ITALIC, simple(Material.FEATHER,
+                "<#ffda4a>Имя — <i>Курсив</i></#ffda4a>",
+                List.of("<dark_gray>Включает/выключает <i>",
+                        "<dark_gray>Текущее: " + (containsTag(draft.displayName(), "i") ? "<green>да" : "<red>нет"))));
+        inv.setItem(SLOT_NAME_RESET, simple(Material.BARRIER,
+                "<red>Имя — сбросить оформление</red>",
+                List.of("<dark_gray>Удаляет все MiniMessage-теги")));
+
+        // ── STYLE colour palette + B/I + reset ─────────────────────────────
+        for (int i = 0; i < COLOR_NAMES.length; i++) {
+            int slot = STYLE_COLOR_SLOTS[i];
+            inv.setItem(slot, colorButton(COLOR_NAMES[i], COLOR_WOOLS[i], "стиль"));
+        }
+        inv.setItem(SLOT_STYLE_BOLD, simple(Material.GOLDEN_APPLE,
+                "<#ffda4a>Стиль — <b>Жирный</b></#ffda4a>",
+                List.of("<dark_gray>Включает/выключает <b>",
+                        "<dark_gray>Текущее: " + (containsTag(draft.style(), "b") ? "<green>да" : "<red>нет"))));
+        inv.setItem(SLOT_STYLE_ITALIC, simple(Material.FEATHER,
+                "<#ffda4a>Стиль — <i>Курсив</i></#ffda4a>",
+                List.of("<dark_gray>Включает/выключает <i>",
+                        "<dark_gray>Текущее: " + (containsTag(draft.style(), "i") ? "<green>да" : "<red>нет"))));
+        inv.setItem(SLOT_STYLE_RESET, simple(Material.BARRIER,
+                "<red>Стиль — сбросить оформление</red>",
+                List.of("<dark_gray>Удаляет все MiniMessage-теги")));
+
+        // ── Bottom action row ──────────────────────────────────────────────
+        inv.setItem(SLOT_CANCEL, simple(Material.RED_CONCRETE, "<red>Отмена</red>",
                 List.of("<gray>Закрыть без сохранения.")));
+        inv.setItem(SLOT_SAVE, simple(Material.LIME_CONCRETE, "<green>Сохранить</green>",
+                List.of("<gray>Записывает персонажа.")));
         if (!isNew) {
-            inv.setItem(26, simple(Material.BARRIER, "<dark_red>Удалить</dark_red>",
+            inv.setItem(SLOT_DELETE, simple(Material.BARRIER, "<dark_red>Удалить</dark_red>",
                     List.of("<gray>Двойной клик для подтверждения.")));
         }
         player.openInventory(inv);
+    }
+
+    private ItemStack colorButton(String color, Material wool, String scope) {
+        return simple(wool, "<" + color + ">" + color + "</" + color + ">",
+                List.of("<gray>Применить цвет к " + scope,
+                        "<dark_gray>Цвет ставится в начало строки"));
+    }
+
+    private static String escape(String s) {
+        if (s == null) return "—";
+        // Display the raw string in lore without re-rendering MM
+        return s.replace("<", "&lt;");
+    }
+
+    public static boolean containsTag(String input, String tag) {
+        if (input == null) return false;
+        String low = input.toLowerCase();
+        return low.contains("<" + tag + ">")
+                || low.contains("<" + tag.toLowerCase() + ">")
+                || (tag.equals("b") && low.contains("<bold>"))
+                || (tag.equals("i") && low.contains("<italic>"));
     }
 
     public ItemStack buildHead(RpcCharacter ch) {
@@ -104,13 +204,13 @@ public final class RpcGui {
             meta.displayName(Text.parse(ch.displayName()));
             List<Component> lore = new ArrayList<>();
             lore.add(Text.parse("<dark_gray>id: <white>" + ch.id() + "</white>"));
-            lore.add(Text.parse("<dark_gray>стиль: <white>" + ch.style() + "</white>"));
+            lore.add(Text.parse("<dark_gray>стиль: <white>" + escape(ch.style()) + "</white>"));
             lore.add(Text.parse("<dark_gray>радиус: <white>" + ch.radius() + "</white>"));
             lore.add(Component.empty());
             lore.add(Text.parse("<gray>" + previewLine(ch)));
             lore.add(Component.empty());
-            lore.add(Text.parse("<yellow>ЛКМ — редактировать"));
-            lore.add(Text.parse("<yellow>ПКМ — удалить (Shift+ПКМ для подтверждения)"));
+            lore.add(Text.parse("<#ffda4a>ЛКМ — редактировать"));
+            lore.add(Text.parse("<#ffda4a>ПКМ — удалить (Shift+ПКМ для подтверждения)"));
             meta.lore(lore);
             head.setItemMeta(meta);
         }
@@ -167,7 +267,7 @@ public final class RpcGui {
 
     private String previewLine(RpcCharacter ch) {
         String style = ch.style() == null ? "" : ch.style();
-        return Text.plain(Text.parse("[ " + ch.displayName() + " ] " + style + plugin.configs().gm()
+        return Text.plain(Text.parse(ch.displayName() + " " + style + plugin.configs().gm()
                 .getString("preview_text", "Привет, путник."), Map.of()));
     }
 

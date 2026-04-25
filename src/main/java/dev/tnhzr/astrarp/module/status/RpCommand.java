@@ -36,7 +36,7 @@ public final class RpCommand implements CommandExecutor, TabCompleter {
                 return true;
             }
             StatusModule.RpStatus next = module.toggleRp(player.getUniqueId());
-            String key = next == StatusModule.RpStatus.RP ? "status.self_rp_on" : "status.self_rp_off";
+            String key = next == StatusModule.RpStatus.RP ? "status.self_rp_on" : "status.self_nrp_on";
             plugin.messages().send(player, key);
             return true;
         }
@@ -53,7 +53,7 @@ public final class RpCommand implements CommandExecutor, TabCompleter {
         }
 
         StatusModule.RpStatus next = module.toggleRp(target.getUniqueId());
-        String key = next == StatusModule.RpStatus.RP ? "status.admin_rp_on" : "status.admin_rp_off";
+        String key = next == StatusModule.RpStatus.RP ? "status.admin_rp_on" : "status.admin_nrp_on";
         plugin.messages().send(sender, key, Map.of("player", target.getName()));
         plugin.messages().send(target, key.replace("admin", "self"));
         return true;

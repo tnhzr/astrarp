@@ -34,6 +34,10 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
         }
         String sub = args[0].toLowerCase();
         switch (sub) {
+            case "help", "?" -> {
+                sendHelp(sender);
+                return true;
+            }
             case "reload" -> {
                 if (!sender.hasPermission("astrarp.admin.reload")) {
                     plugin.messages().send(sender, "common.no_permission");
@@ -93,7 +97,7 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
         sender.sendMessage(Component.text("AstraRP debug ── values for " + target.getName() + ":"));
 
         StatusModule.RpStatus status = plugin.status() == null
-                ? StatusModule.RpStatus.NONE
+                ? StatusModule.RpStatus.NRP
                 : plugin.status().get(target.getUniqueId());
         sender.sendMessage(Component.text("  status_raw : " + (plugin.status() == null
                 ? "(module disabled)"
@@ -123,10 +127,18 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
         }
     }
 
+    private void sendHelp(CommandSender sender) {
+        plugin.messages().send(sender, "core.help_header");
+        plugin.messages().send(sender, "core.help_reload");
+        plugin.messages().send(sender, "core.help_debug");
+        plugin.messages().send(sender, "core.help_help");
+        plugin.messages().send(sender, "core.help_subcommands");
+    }
+
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
                                       @NotNull String alias, @NotNull String[] args) {
-        if (args.length == 1) return List.of("reload", "debug");
+        if (args.length == 1) return List.of("reload", "debug", "help");
         if (args.length == 2 && "debug".equalsIgnoreCase(args[0])) {
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) names.add(p.getName());

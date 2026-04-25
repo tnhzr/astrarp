@@ -17,6 +17,11 @@ public final class StatusListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        java.util.UUID uuid = event.getPlayer().getUniqueId();
+        // Default first-join state is NRP — players never see a "no status" state.
+        if (!module.has(uuid)) {
+            module.set(uuid, StatusModule.RpStatus.NRP);
+        }
         plugin.getServer().getScheduler().runTaskLater(plugin,
                 () -> module.applyDisplay(event.getPlayer()), 5L);
     }

@@ -98,22 +98,23 @@ public final class NamesModule implements AstraModule {
     }
 
     public boolean validate(String name) {
-        int min = plugin.configs().names().getInt("validation.min_length", 2);
-        int max = plugin.configs().names().getInt("validation.max_length", 32);
-        int minWords = plugin.configs().names().getInt("validation.min_words", 1);
-        int maxWords = plugin.configs().names().getInt("validation.max_words", 2);
-        // Backwards compat: if the legacy require_space flag is still set,
-        // bump the minimum word count to two so single-word names are rejected.
-        if (plugin.configs().names().getBoolean("validation.require_space", false)) {
-            minWords = Math.max(minWords, 2);
-        }
-        String pattern = plugin.configs().names().getString("validation.regex",
-                "^[A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё'\\-]*( [A-Za-zА-Яа-яЁё][A-Za-zА-Яа-яЁё'\\-]*)*$");
         if (name == null) return false;
         String trimmed = name.trim();
+        int min = plugin.configs().names().getInt("validation.min_length", 1);
+        int max = plugin.configs().names().getInt("validation.max_length", 32);
         if (trimmed.length() < min || trimmed.length() > max) return false;
-        int words = trimmed.split("\\s+").length;
-        if (words < minWords || words > maxWords) return false;
+
+        // Reject ASCII control characters (newline, tab, etc.) — they corrupt
+        // chat rendering and tab list. Everything else (spaces, emoji, |, &
+        // codes, MM tags, etc.) is allowed by default.
+        for (int i = 0; i < trimmed.length(); i++) {
+            char c = trimmed.charAt(i);
+            if (c < 0x20 || c == 0x7F) return false;
+        }
+
+        // Optional opt-in regex for admins who want stricter validation.
+        String pattern = plugin.configs().names().getString("validation.regex", "");
+        if (pattern == null || pattern.isBlank()) return true;
         try {
             return trimmed.matches(pattern);
         } catch (Exception ex) {
