@@ -6,6 +6,7 @@ import dev.tnhzr.astrarp.module.status.StatusModule;
 import dev.tnhzr.astrarp.util.Text;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.placeholder.PlaceholderManager;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.UUID;
 
@@ -43,11 +44,13 @@ public final class TabBridge {
                     .orElse("");
         });
 
+        // TAB renders placeholder strings with legacy '\u00a7' colour codes by
+        // default, so MiniMessage tags would otherwise show up as literal text.
         pm.registerPlayerPlaceholder("%astrarp_status%", 500, tabPlayer -> {
             StatusModule status = plugin.status();
             if (status == null) return "";
             StatusModule.RpStatus s = status.get(tabPlayer.getUniqueId());
-            return Text.plain(Text.parse(status.iconRaw(s)));
+            return LegacyComponentSerializer.legacySection().serialize(Text.parse(status.iconRaw(s)));
         });
 
         pm.registerPlayerPlaceholder("%astrarp_status_raw%", 500, tabPlayer -> {

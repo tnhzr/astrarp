@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.4] — 2026-04-25
+
+### Fixed
+
+- `/rpc create` editor: clicking a field button after typing the previous
+  value into chat no longer leaves the GUI unresponsive. `closeInventory()`
+  is now scheduled on the next tick instead of being called from inside the
+  click handler — the synchronous path was racing with Paper's inventory
+  packet sequencing and the reopened editor was rendering with a stale
+  client view.
+- `%astrarp_status%` keeps its colour. The PlaceholderAPI expansion used to
+  strip every `<color>` tag through `PlainTextComponentSerializer`, so
+  FlectonePulse received the literal text `RP` and rendered it white. The
+  expansion now returns raw MiniMessage so chat plugins that re-parse it
+  (FlectonePulse, default Paper chat) keep the colour, and the TAB bridge
+  pre-renders to legacy `§` codes so TAB shows colour too.
+
+### Added
+
+- Two new placeholder variants for consumers that don't speak
+  MiniMessage: `%astrarp_status_legacy%` (legacy `§` codes) and
+  `%astrarp_status_plain%` (no formatting at all). `%astrarp_status%`
+  itself is now MiniMessage by default.
+
+### Removed
+
+- `RpcGui` no longer auto-clears the in-memory edit draft on inventory
+  close. The five-tick delayed clear was racing with the chat-input flow
+  and silently nulling the draft, which is what made every editor button
+  appear dead after the first ID input. Drafts are now cleared only by
+  Save / Cancel / Delete or on plugin disable.
+
 ## [1.0.3] — 2026-04-25
 
 ### Fixed

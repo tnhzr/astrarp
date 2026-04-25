@@ -113,9 +113,13 @@ public final class GMListener implements Listener {
     private void startChat(Player player, RpcCharacter draft, RpcEditSessions.Field field, boolean idChange) {
         module.sessions().setAwaiting(player.getUniqueId(),
                 new RpcEditSessions.Pending(draft.id(), idChange, field));
-        player.closeInventory();
-        plugin.messages().send(player, "gm.rpc_enter_value",
-                java.util.Map.of("field", field.name().toLowerCase()));
+        // Paper deadlocks the inventory packet sequence if we close from inside
+        // an InventoryClickEvent handler synchronously — defer one tick.
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            player.closeInventory();
+            plugin.messages().send(player, "gm.rpc_enter_value",
+                    java.util.Map.of("field", field.name().toLowerCase()));
+        });
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
@@ -201,19 +205,8 @@ public final class GMListener implements Listener {
 
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
-        if (!(event.getInventory().getHolder() instanceof RpcGuiHolder holder)) return;
-        if (!RpcGui.EDIT_TITLE.equals(holder.tag())) return;
-        // If we still have a draft and no pending chat input, do not auto-save —
-        // user chose to close without pressing Save. Drop draft after a short delay
-        // so re-opening editor (during chat input flow) keeps state.
-        UUID id = event.getPlayer().getUniqueId();
-        RpcEditSessions.Pending pending = module.sessions().awaiting(id);
-        if (pending == null) {
-            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-                if (module.sessions().awaiting(id) == null) {
-                    module.sessions().clear(id);
-                }
-            }, 5L);
-        }
+        // Drafts now live for the duration of the player's editing flow; they are
+        // cleared explicitly by Save / Cancel / Delete or on disable. Auto-clearing
+        // on close raced with the chat-then-reopen flow and broke buttons.
     }
 }

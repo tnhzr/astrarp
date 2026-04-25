@@ -5,6 +5,7 @@ import dev.tnhzr.astrarp.module.names.NamesModule;
 import dev.tnhzr.astrarp.module.status.StatusModule;
 import dev.tnhzr.astrarp.util.Text;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,22 +26,40 @@ public final class AstraPlaceholders extends PlaceholderExpansion {
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player == null) return "";
+        StatusModule status = plugin.status();
+        NamesModule names = plugin.names();
         switch (params.toLowerCase()) {
+            // Default %astrarp_status% returns raw MiniMessage so chat plugins
+            // that re-parse it with MiniMessage (FlectonePulse, default Paper
+            // chat) keep colours. Use _legacy / _plain for other consumers.
             case "status" -> {
-                StatusModule.RpStatus s = plugin.status().get(player.getUniqueId());
-                return Text.plain(Text.parse(plugin.status().iconRaw(s)));
+                if (status == null) return "";
+                return status.iconRaw(status.get(player.getUniqueId()));
+            }
+            case "status_legacy" -> {
+                if (status == null) return "";
+                return LegacyComponentSerializer.legacySection()
+                        .serialize(Text.parse(status.iconRaw(status.get(player.getUniqueId()))));
+            }
+            case "status_plain" -> {
+                if (status == null) return "";
+                return Text.plain(Text.parse(status.iconRaw(status.get(player.getUniqueId()))));
             }
             case "status_raw" -> {
-                StatusModule.RpStatus s = plugin.status().get(player.getUniqueId());
-                return plugin.status().rawString(s);
+                if (status == null) return "";
+                return status.rawString(status.get(player.getUniqueId()));
             }
             case "rpname" -> {
-                NamesModule.RpName entry = plugin.names().get(player.getUniqueId()).orElse(null);
+                if (names == null) {
+                    return player.getName() == null ? "" : player.getName();
+                }
+                NamesModule.RpName entry = names.get(player.getUniqueId()).orElse(null);
                 if (entry != null) return entry.name();
                 return player.getName() == null ? "" : player.getName();
             }
             case "rpname_raw" -> {
-                NamesModule.RpName entry = plugin.names().get(player.getUniqueId()).orElse(null);
+                if (names == null) return "";
+                NamesModule.RpName entry = names.get(player.getUniqueId()).orElse(null);
                 return entry == null ? "" : entry.name();
             }
             default -> {
