@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.1] — 2026-04-25
+
+### Fixed
+
+- Switch to classic `plugin.yml` (Bukkit-style) so commands declared in YAML
+  are honored on Paper 1.21.8. Paper plugins (`paper-plugin.yml`) reject
+  `JavaPlugin#getCommand` and require `registerCommand` instead, which broke
+  plugin enable. All commands and permissions are unchanged.
+
 ## [1.0.0] — 2026-04-25
 
 ### Added — Initial release
