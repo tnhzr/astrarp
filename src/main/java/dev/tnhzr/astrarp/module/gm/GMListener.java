@@ -78,8 +78,8 @@ public final class GMListener implements Listener {
         RpcCharacter draft = module.sessions().draft(player.getUniqueId());
         if (draft == null) return;
         int slot = event.getRawSlot();
-        // Slots inside the player inventory are >= editor size (54).
-        if (slot >= 54) return;
+        // Compact editor is 27 slots; ignore clicks that fall in the player's own inventory.
+        if (slot >= 27) return;
 
         // Field-edit clicks ────────────────────────────────────────────────
         if (slot == RpcGui.SLOT_ID) { startChat(player, draft, RpcEditSessions.Field.ID, true); return; }
@@ -114,27 +114,35 @@ public final class GMListener implements Listener {
             return;
         }
 
-        // Format toggles ──────────────────────────────────────────────────
-        if (slot == RpcGui.SLOT_NAME_BOLD) {
-            draft.setDisplayName(StyleEdit.toggleTag(draft.displayName(), "b"));
+        ClickType ct = event.getClick();
+
+        // Colour cyclers — LMB next, RMB prev, Shift+LMB clear ───────────
+        if (slot == RpcGui.SLOT_NAME_COLOR) {
+            draft.setDisplayName(cycleOrClear(draft.displayName(), ct));
             redrawEditor(player, draft);
             return;
         }
-        if (slot == RpcGui.SLOT_NAME_ITALIC) {
-            draft.setDisplayName(StyleEdit.toggleTag(draft.displayName(), "i"));
+        if (slot == RpcGui.SLOT_STYLE_COLOR) {
+            draft.setStyle(cycleOrClear(draft.style(), ct));
             redrawEditor(player, draft);
             return;
         }
-        if (slot == RpcGui.SLOT_STYLE_BOLD) {
-            draft.setStyle(StyleEdit.toggleTag(draft.style(), "b"));
+
+        // Format cyclers — LMB toggles bold, RMB toggles italic ──────────
+        if (slot == RpcGui.SLOT_NAME_FORMAT) {
+            String tag = ct == ClickType.RIGHT || ct == ClickType.SHIFT_RIGHT ? "i" : "b";
+            draft.setDisplayName(StyleEdit.toggleTag(draft.displayName(), tag));
             redrawEditor(player, draft);
             return;
         }
-        if (slot == RpcGui.SLOT_STYLE_ITALIC) {
-            draft.setStyle(StyleEdit.toggleTag(draft.style(), "i"));
+        if (slot == RpcGui.SLOT_STYLE_FORMAT) {
+            String tag = ct == ClickType.RIGHT || ct == ClickType.SHIFT_RIGHT ? "i" : "b";
+            draft.setStyle(StyleEdit.toggleTag(draft.style(), tag));
             redrawEditor(player, draft);
             return;
         }
+
+        // Reset buttons ──────────────────────────────────────────────────
         if (slot == RpcGui.SLOT_NAME_RESET) {
             draft.setDisplayName(StyleEdit.stripFormatting(draft.displayName()));
             redrawEditor(player, draft);
@@ -145,25 +153,14 @@ public final class GMListener implements Listener {
             redrawEditor(player, draft);
             return;
         }
-
-        // Colour palette ──────────────────────────────────────────────────
-        int idx = indexOf(RpcGui.NAME_COLOR_SLOTS, slot);
-        if (idx >= 0 && idx < RpcGui.COLOR_NAMES.length) {
-            draft.setDisplayName(StyleEdit.applyColor(draft.displayName(), RpcGui.COLOR_NAMES[idx]));
-            redrawEditor(player, draft);
-            return;
-        }
-        idx = indexOf(RpcGui.STYLE_COLOR_SLOTS, slot);
-        if (idx >= 0 && idx < RpcGui.COLOR_NAMES.length) {
-            draft.setStyle(StyleEdit.applyColor(draft.style(), RpcGui.COLOR_NAMES[idx]));
-            redrawEditor(player, draft);
-            return;
-        }
     }
 
-    private static int indexOf(int[] arr, int v) {
-        for (int i = 0; i < arr.length; i++) if (arr[i] == v) return i;
-        return -1;
+    private static String cycleOrClear(String input, ClickType ct) {
+        if (ct == ClickType.SHIFT_LEFT || ct == ClickType.SHIFT_RIGHT) {
+            return StyleEdit.clearColor(input);
+        }
+        int direction = (ct == ClickType.RIGHT) ? -1 : 1;
+        return StyleEdit.cycleColor(input, RpcGui.COLOR_NAMES, direction);
     }
 
     private void redrawEditor(Player player, RpcCharacter draft) {

@@ -182,6 +182,16 @@ groups:
 
 3. **Если голов всё равно нет** — обнови ChatHeads до последней версии и проверь, что у тебя включена UUID-подпись чата на сервере (`paper-global.yml → packet-events: enabled` или `online-mode: true`).
 
+4. **Подсказка из коробки (с v1.0.6).** AstraRP добавляет к каждому чат-сообщению почти-невидимый суффикс `(<ник>)` тёмным цветом — этого хватает, чтобы ChatHeads нашёл автора даже когда `/msg <player>` отсутствует или FlectonePulse рендерит сообщение нестандартно. Управляется в `config.yml`:
+
+   ```yaml
+   chatheads:
+     enabled: true
+     suffix_format: " <#1a1a1a><i>({player})</i></#1a1a1a>"
+   ```
+
+   Выключи (`enabled: false`), если уже настроил совместимость через `nameAliases` на клиенте.
+
 ### LuckPerms meta-bridge (опционально)
 
 Если хочется собирать имя через мету LuckPerms (например, для совместимости со старыми шаблонами), включите `luckperms.write_meta: true` в `modules/names.yml` — AstraRP запишет ключ `astrarp_rpname` в LuckPerms-мету игрока, и его можно использовать как `%luckperms_meta_astrarp_rpname%`.
