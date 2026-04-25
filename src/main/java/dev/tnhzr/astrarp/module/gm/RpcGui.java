@@ -66,7 +66,10 @@ public final class RpcGui {
     public static final Material[] COLOR_WOOLS = {
             Material.BLACK_WOOL, Material.BLUE_WOOL, Material.GREEN_WOOL, Material.CYAN_WOOL,
             Material.RED_WOOL, Material.PURPLE_WOOL, Material.ORANGE_WOOL, Material.LIGHT_GRAY_WOOL,
-            Material.GRAY_WOOL, Material.LIGHT_BLUE_WOOL, Material.LIME_WOOL, Material.LIGHT_BLUE_WOOL,
+            // "aqua" gets HEART_OF_THE_SEA so it stays visually distinct from
+            // the LIGHT_BLUE_WOOL used for "blue" — Minecraft has no separate
+            // wool for both.
+            Material.GRAY_WOOL, Material.LIGHT_BLUE_WOOL, Material.LIME_WOOL, Material.HEART_OF_THE_SEA,
             Material.PINK_WOOL, Material.MAGENTA_WOOL, Material.YELLOW_WOOL
     };
 
@@ -184,8 +187,11 @@ public final class RpcGui {
 
     private static String escape(String s) {
         if (s == null) return "—";
-        // Display the raw string in lore without re-rendering MM
-        return s.replace("<", "&lt;");
+        // Display the raw string in lore without re-rendering MM. We can't use
+        // `&lt;` because Text.parse() runs legacy code conversion first and
+        // `&l` would be promoted to <bold>, mangling the rest of the lore.
+        // MiniMessage's backslash escape leaves `<` literal at render time.
+        return s.replace("<", "\\<");
     }
 
     public static boolean containsTag(String input, String tag) {

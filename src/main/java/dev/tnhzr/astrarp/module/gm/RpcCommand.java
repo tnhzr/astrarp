@@ -187,7 +187,7 @@ public final class RpcCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
                                       @NotNull String alias, @NotNull String[] args) {
         if (args.length == 1) {
-            List<String> all = new ArrayList<>(List.of("show", "create", "delete", "list"));
+            List<String> all = new ArrayList<>(List.of("show", "create", "delete", "list", "help"));
             for (RpcCharacter ch : module.repository().all()) all.add(ch.id());
             List<String> out = new ArrayList<>();
             for (String s : all) if (s.toLowerCase().startsWith(args[0].toLowerCase())) out.add(s);
