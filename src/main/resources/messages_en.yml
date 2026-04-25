@@ -23,12 +23,13 @@ status:
   admin_nrp_off: "<gray><yellow>{player}</yellow> NRP status removed."
 
 names:
-  usage_self: "<gray>Usage: <yellow>/rpname set \"<First Last>\""
-  usage_admin: "<gray>Usage: <yellow>/rpaname <player> set \"<First Last>\""
-  invalid: "<red>Invalid name format. Use First Last (each at least 2 letters)."
+  usage_self: "<gray>Usage: <yellow>/rpname set \"<Name>\" or \"<First Last>\""
+  usage_admin: "<gray>Usage: <yellow>/rpaname <player> set \"<Name>\" or \"<First Last>\""
+  invalid: "<red>Invalid name format. One or two words allowed (each at least 2 letters)."
   cooldown: "<red>Wait <yellow>{seconds}s</yellow> before changing your RP name again."
   set_self: "<green>RP name set: <gold>{name}</gold>."
   set_admin: "<green><yellow>{player}</yellow>'s RP name is now <gold>{name}</gold>."
+  notify_unset: "<yellow>You have no RP name set yet. Use <gold>/rpname set \"Name\"</gold> or <gold>/rpname set \"First Last\"</gold>."
 
 keepinv:
   kept: "<aqua>Your items were preserved."

@@ -23,8 +23,19 @@ public final class NamesListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
         plugin.getServer().getScheduler().runTaskLater(plugin,
-                () -> module.applyDisplay(event.getPlayer()), 5L);
+                () -> module.applyDisplay(player), 5L);
+
+        if (plugin.configs().names().getBoolean("notify_unset.enabled", true)) {
+            long delay = Math.max(0L, plugin.configs().names().getLong("notify_unset.delay_ticks", 40L));
+            plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                if (!player.isOnline()) return;
+                if (module.get(player.getUniqueId()).isEmpty()) {
+                    plugin.messages().send(player, "names.notify_unset");
+                }
+            }, delay);
+        }
     }
 
     /**
