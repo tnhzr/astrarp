@@ -170,10 +170,42 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
         for (java.util.Map.Entry<String, String> e : aliases.entrySet()) {
             String tail = (++i == aliases.size()) ? "" : ",";
             // chat_heads.json5 stores aliases as { "<rendered text>": "<real username>" }
-            sender.sendMessage(Component.text("    \"" + e.getKey() + "\": \"" + e.getValue() + "\"" + tail));
+            sender.sendMessage(Component.text("    \"" + escapeJson(e.getKey()) + "\": \""
+                    + escapeJson(e.getValue()) + "\"" + tail));
         }
         sender.sendMessage(Component.text("  }"));
         sender.sendMessage(Component.text("After pasting, restart the client (or run /chatheads reload)."));
+    }
+
+    /**
+     * Escapes a string for safe insertion into a JSON / JSON5 double-quoted
+     * string literal. RP-names allow arbitrary characters including
+     * {@code "} and {@code \}, both of which would otherwise terminate the
+     * literal early or be interpreted as escape sequences.
+     */
+    private static String escapeJson(String input) {
+        if (input == null) return "";
+        StringBuilder out = new StringBuilder(input.length() + 2);
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+            switch (c) {
+                case '\\' -> out.append("\\\\");
+                case '"' -> out.append("\\\"");
+                case '\b' -> out.append("\\b");
+                case '\f' -> out.append("\\f");
+                case '\n' -> out.append("\\n");
+                case '\r' -> out.append("\\r");
+                case '\t' -> out.append("\\t");
+                default -> {
+                    if (c < 0x20) {
+                        out.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        out.append(c);
+                    }
+                }
+            }
+        }
+        return out.toString();
     }
 
     @Override

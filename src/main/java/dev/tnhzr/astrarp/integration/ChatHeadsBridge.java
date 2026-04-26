@@ -44,11 +44,11 @@ public final class ChatHeadsBridge implements Listener {
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onChat(AsyncChatEvent event) {
-        if (!plugin.configs().root().getBoolean("chatheads.enabled", true)) return;
+        if (!plugin.configs().root().getBoolean("chatheads.enabled", false)) return;
 
         String format = plugin.configs().root().getString(
                 "chatheads.suffix_format",
-                " <#1a1a1a><i>({player})</i></#1a1a1a>");
+                " <#1a1a1a>({player})</#1a1a1a>");
         if (format == null || format.isEmpty()) return;
 
         Player source = event.getPlayer();
