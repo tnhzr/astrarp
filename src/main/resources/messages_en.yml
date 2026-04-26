@@ -15,6 +15,7 @@ core:
   help_header: "<gradient:#ffb000:#ffe167><b>── AstraRP help ──</b></gradient>"
   help_reload: "  <#ffda4a>/arp reload</#ffda4a> <gray>— reload configs and modules"
   help_debug: "  <#ffda4a>/arp debug [player]</#ffda4a> <gray>— integration & placeholder diagnostics"
+  help_chatheads: "  <#ffda4a>/arp chatheads-aliases</#ffda4a> <gray>— JSON snippet for chat_heads.json5"
   help_help: "  <#ffda4a>/arp help</#ffda4a> <gray>— this message"
   help_subcommands: "<gray>Related commands: <#ffda4a>/rp</#ffda4a>, <#ffda4a>/nrp</#ffda4a>, <#ffda4a>/rpname</#ffda4a>, <#ffda4a>/rpc</#ffda4a>, <#ffda4a>/ifr</#ffda4a>, <#ffda4a>/feel</#ffda4a>"
 

@@ -71,6 +71,26 @@ public final class ConfigManager {
                 plugin.getLogger().warning("Failed to save migrated gm.yml: " + ex.getMessage());
             }
         }
+
+        // v1.0.6 default ChatHeads suffix: " <#1a1a1a><i>({player})</i></#1a1a1a>".
+        // The italic suffix produced rendering glitches on servers running custom-
+        // font resource packs (CraftEngine / ItemsAdder), so v1.0.7+ ships with
+        // chatheads.enabled: false by default. Any user that hadn't customised
+        // either key gets flipped automatically; users with a custom format are
+        // left alone.
+        String currentSuffix = config.getString("chatheads.suffix_format");
+        boolean enabled = config.getBoolean("chatheads.enabled", false);
+        if (enabled && currentSuffix != null
+                && currentSuffix.equals(" <#1a1a1a><i>({player})</i></#1a1a1a>")) {
+            config.set("chatheads.enabled", false);
+            config.set("chatheads.suffix_format", " <#1a1a1a>({player})</#1a1a1a>");
+            try {
+                config.save(new File(plugin.getDataFolder(), "config.yml"));
+                plugin.getLogger().info("Migrated legacy ChatHeads suffix default \u2014 disabled, italic stripped.");
+            } catch (IOException ex) {
+                plugin.getLogger().warning("Failed to save migrated config.yml: " + ex.getMessage());
+            }
+        }
     }
 
     private YamlConfiguration saveAndLoad(String resource) {

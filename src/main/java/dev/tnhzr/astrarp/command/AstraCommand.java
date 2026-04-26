@@ -55,6 +55,14 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
                 runDebug(sender, args);
                 return true;
             }
+            case "chatheads-aliases", "chatheads" -> {
+                if (!sender.hasPermission("astrarp.admin.reload")) {
+                    plugin.messages().send(sender, "common.no_permission");
+                    return true;
+                }
+                printChatHeadsAliases(sender);
+                return true;
+            }
             default -> {
                 plugin.messages().send(sender, "core.usage");
                 return true;
@@ -131,14 +139,47 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
         plugin.messages().send(sender, "core.help_header");
         plugin.messages().send(sender, "core.help_reload");
         plugin.messages().send(sender, "core.help_debug");
+        plugin.messages().send(sender, "core.help_chatheads");
         plugin.messages().send(sender, "core.help_help");
         plugin.messages().send(sender, "core.help_subcommands");
+    }
+
+    /**
+     * Prints a JSON5 {@code nameAliases} block that the server admin can paste
+     * into {@code config/chat_heads.json5} on every client. This is the
+     * recommended ChatHeads integration path for setups that use FlectonePulse
+     * or any other plugin that strips the original username from chat — the
+     * mod uses these aliases to resolve RP-names back to real player UUIDs
+     * without us injecting visible suffixes that break custom-font resource
+     * packs.
+     */
+    private void printChatHeadsAliases(CommandSender sender) {
+        if (plugin.names() == null) {
+            sender.sendMessage(Component.text("Names module is disabled — no aliases to print."));
+            return;
+        }
+        java.util.Map<String, String> aliases = new java.util.LinkedHashMap<>();
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            plugin.names().get(online.getUniqueId()).ifPresent(rp ->
+                    aliases.put(rp.name(), online.getName()));
+        }
+        sender.sendMessage(Component.text("AstraRP \u2192 ChatHeads aliases (" + aliases.size() + "):"));
+        sender.sendMessage(Component.text("  Paste into config/chat_heads.json5 on the client:"));
+        sender.sendMessage(Component.text("  \"nameAliases\": {"));
+        int i = 0;
+        for (java.util.Map.Entry<String, String> e : aliases.entrySet()) {
+            String tail = (++i == aliases.size()) ? "" : ",";
+            // chat_heads.json5 stores aliases as { "<rendered text>": "<real username>" }
+            sender.sendMessage(Component.text("    \"" + e.getKey() + "\": \"" + e.getValue() + "\"" + tail));
+        }
+        sender.sendMessage(Component.text("  }"));
+        sender.sendMessage(Component.text("After pasting, restart the client (or run /chatheads reload)."));
     }
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command,
                                       @NotNull String alias, @NotNull String[] args) {
-        if (args.length == 1) return List.of("reload", "debug", "help");
+        if (args.length == 1) return List.of("reload", "debug", "chatheads-aliases", "help");
         if (args.length == 2 && "debug".equalsIgnoreCase(args[0])) {
             List<String> names = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) names.add(p.getName());
