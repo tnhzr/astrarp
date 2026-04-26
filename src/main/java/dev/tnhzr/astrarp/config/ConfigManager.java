@@ -45,6 +45,32 @@ public final class ConfigManager {
         keepInvCfg = saveAndLoad("modules/keepinventory.yml");
         framesCfg = saveAndLoad("modules/frames.yml");
         gmCfg = saveAndLoad("modules/gm.yml");
+
+        migrateLegacyDefaults();
+    }
+
+    /**
+     * Rewrite legacy default values that we used to ship and that users almost
+     * certainly never customised. {@link #saveAndLoad} only fills in *missing*
+     * keys, so once a file is on disk with the old default we never replace it
+     * automatically — which is why bracket-formatted RPC names kept showing up
+     * after the v1.0.5 default change. Anything matched here is replaced with
+     * the current jar default.
+     */
+    private void migrateLegacyDefaults() {
+        // v1.0.0 default: "<gold>[ <reset>{name}<gold> ]</gold> {style}{text}"
+        String currentRpcFormat = gmCfg.getString("rpc.format");
+        if (currentRpcFormat != null && currentRpcFormat.contains("<gold>[ <reset>")
+                && currentRpcFormat.contains("<gold> ]</gold>")) {
+            String newFormat = "{name} {style}{text}";
+            gmCfg.set("rpc.format", newFormat);
+            try {
+                gmCfg.save(new File(plugin.getDataFolder(), "modules/gm.yml"));
+                plugin.getLogger().info("Migrated legacy rpc.format default \u2014 brackets removed.");
+            } catch (IOException ex) {
+                plugin.getLogger().warning("Failed to save migrated gm.yml: " + ex.getMessage());
+            }
+        }
     }
 
     private YamlConfiguration saveAndLoad(String resource) {

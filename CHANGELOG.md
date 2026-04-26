@@ -7,10 +7,11 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - **ChatHeads — серверный мост.** Плагин подмешивает к каждому чат-сообщению
-  почти-невидимый суффикс `(<ник>)` тёмным цветом. Этого хватает, чтобы
-  ChatHeads нашёл автора даже когда сообщение идёт через FlectonePulse и
-  «настоящий» ник нигде не виден. Управляется через `chatheads.enabled` и
-  `chatheads.suffix_format` в `config.yml`.
+  почти-невидимый суффикс `(<ник>)` тёмным цветом прямо в `event.message()`
+  на priority=`HIGH`. ChatHeads находит ник в видимой строке (heuristic
+  detection) и рисует голову даже когда FlectonePulse полностью отменяет
+  `AsyncChatEvent` и шлёт чат как system-message. Управляется через
+  `chatheads.enabled` и `chatheads.suffix_format` в `config.yml`.
 
 ### Changed
 
@@ -24,6 +25,17 @@ All notable changes to this project will be documented in this file.
 - **Превью с цветами.** Слот превью в редакторе и лор у голов в списке
   персонажей теперь рендерят MiniMessage напрямую через Component-лор —
   цвета, градиенты и теги видно «как в чате», а не серым plain-текстом.
+- **Лор и заголовки больше не курсивят сами себя.** Все компоненты в GUI
+  оборачиваются в `Component.empty().decoration(ITALIC, false)`, чтобы
+  ванильный default-italic от Bukkit не съедал читаемость превью.
+
+### Fixed
+
+- **Авто-`[ ]` у `/rpc` уходят при апгрейде.** Старый дефолт `rpc.format`
+  (`<gold>[ <reset>{name}<gold> ]</gold> {style}{text}`) автоматически
+  мигрирует на новый формат `{name} {style}{text}` при старте плагина —
+  раньше `saveAndLoad` только дописывал недостающие ключи и оставлял
+  старое значение нетронутым. Кастомные форматы пользователя не трогаются.
 
 ## [1.0.5] — 2026-04-25
 
