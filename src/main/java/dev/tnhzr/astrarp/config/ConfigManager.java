@@ -72,25 +72,15 @@ public final class ConfigManager {
             }
         }
 
-        // ChatHeads suffix is one-shot disabled on the first launch of v1.0.7+.
-        // The previous default ({@code <i>(...)</i>} at very dark colour) broke
-        // chat on servers running custom-font resource packs (CraftEngine /
-        // ItemsAdder) because the per-player suffix has no glyphs in those
-        // override fonts and renders as missing-glyph boxes. We can't reliably
-        // detect "user really wanted this on" vs. "user just inherited the old
-        // default", so we flip {@code enabled} to false exactly once and write
-        // a marker key. Anyone who explicitly sets {@code enabled: true} after
-        // the marker is set keeps it on.
-        if (!config.getBoolean("chatheads.migrated_v107", false)) {
-            String currentSuffix = config.getString("chatheads.suffix_format");
-            if (currentSuffix != null && currentSuffix.contains("<i>") && currentSuffix.contains("({player})")) {
-                config.set("chatheads.suffix_format", " <#1a1a1a>({player})</#1a1a1a>");
-            }
-            config.set("chatheads.enabled", false);
-            config.set("chatheads.migrated_v107", true);
+        // The v1.0.6 ChatHeads bridge proved unreliable on servers with custom-
+        // font resource packs (CraftEngine / ItemsAdder) and was removed in
+        // v1.0.7. Wipe any leftover {@code chatheads:*} keys from the on-disk
+        // config so the file doesn't carry dead options forever.
+        if (config.contains("chatheads")) {
+            config.set("chatheads", null);
             try {
                 config.save(new File(plugin.getDataFolder(), "config.yml"));
-                plugin.getLogger().info("Disabled ChatHeads suffix on upgrade to v1.0.7 \u2014 see /arp chatheads-aliases for the universal nameAliases path.");
+                plugin.getLogger().info("Removed obsolete chatheads.* configuration block.");
             } catch (IOException ex) {
                 plugin.getLogger().warning("Failed to save migrated config.yml: " + ex.getMessage());
             }

@@ -157,41 +157,6 @@ groups:
 
 `customtabname`/`customtagname` определяют, что увидит игрок в табе и над головой соответственно. Если AstraRP запущен без TAB, плейсхолдеры всё равно доступны через PlaceholderAPI (`%astrarp_rpname%` и т. д.).
 
-### ChatHeads (мод на клиенте)
-
-[ChatHeads](https://modrinth.com/mod/chat-heads) рисует голову отправителя рядом с его сообщениями. Когда чат идёт через FlectonePulse + AstraRP, мод теряет автора, потому что плагин шлёт сообщение от лица сервера, а не от игрока.
-
-Чтобы мод снова находил автора:
-
-1. **На клиенте.** В `config/chat_heads.json5` поставь:
-   ```json5
-   senderDetection: "HEURISTIC_AND_UUID",
-   ```
-   `HEURISTIC_ONLY` — крайний вариант, если UUID-детект мешает.
-
-2. **На сервере (FlectonePulse).** Шаблон `name.display` обязан содержать настоящий ник игрока внутри click-action. ChatHeads ищет паттерн `/msg|/tell|/w|/whisper <username>`. Стандартный шаблон уже подходит — главное **не убирать** `/msg <player>` из click:
-
-   ```yaml
-   message:
-     format:
-       name_:
-         display: "<click:suggest_command:'/msg <player>'>...<fcolor:2>%astrarp_rpname%<afk_suffix></hover></click>"
-   ```
-
-   `%astrarp_rpname%` идёт в видимый текст, `<player>` остаётся внутри `/msg ...` — так у мода есть зацепка для головы, а игрок видит РП-имя.
-
-3. **Если голов всё равно нет** — обнови ChatHeads до последней версии и проверь, что у тебя включена UUID-подпись чата на сервере (`paper-global.yml → packet-events: enabled` или `online-mode: true`).
-
-4. **Серверный суффикс (опционально, по умолчанию ВЫКЛЮЧЕН).** AstraRP может приписывать к каждому чат-сообщению невидимый суффикс `(<ник>)` тёмным цветом — этого хватает, чтобы ChatHeads нашёл автора. Но на серверах с кастомными ресурс-паками (CraftEngine, ItemsAdder, Oraxen) суффикс рендерится квадратиками, поэтому с v1.0.7 он отключён по умолчанию. Включай только если у тебя обычный сервер без кастомных шрифтов:
-
-   ```yaml
-   chatheads:
-     enabled: true
-     suffix_format: " <#1a1a1a>({player})</#1a1a1a>"
-   ```
-
-5. **Универсальный путь — `nameAliases` на клиенте.** Запусти на сервере `/arp chatheads-aliases` (нужен пермишн `astrarp.admin.reload`) — AstraRP распечатает готовый JSON-блок со всеми текущими РП-именами и реальными никнеймами. Скопируй этот блок в `~/.minecraft/config/chat_heads.json5` под ключ `nameAliases`, перезапусти клиент. Этот способ работает на любых серверах, не зависит от того, какой плагин рендерит чат, и не печатает никаких лишних суффиксов.
-
 ### LuckPerms meta-bridge (опционально)
 
 Если хочется собирать имя через мету LuckPerms (например, для совместимости со старыми шаблонами), включите `luckperms.write_meta: true` в `modules/names.yml` — AstraRP запишет ключ `astrarp_rpname` в LuckPerms-мету игрока, и его можно использовать как `%luckperms_meta_astrarp_rpname%`.
