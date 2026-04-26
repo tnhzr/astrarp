@@ -3,6 +3,7 @@ package dev.tnhzr.astrarp.module.gm;
 import dev.tnhzr.astrarp.AstraRP;
 import dev.tnhzr.astrarp.util.Text;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -106,10 +107,10 @@ public final class RpcGui {
         ItemStack icon = buildIcon(draft);
         ItemMeta im = icon.getItemMeta();
         if (im != null) {
-            im.displayName(Text.parse("<#ffda4a>Иконка</#ffda4a>"));
+            im.displayName(noItalic(Text.parse("<#ffda4a>Иконка</#ffda4a>")));
             List<Component> lore = new ArrayList<>();
-            lore.add(Text.parse("<gray>Текущее: <white>" + (draft.icon() == null ? "—" : draft.icon()) + "</white>"));
-            lore.add(Text.parse("<dark_gray>Клик: ник игрока или Base64"));
+            lore.add(noItalic(Text.parse("<gray>Текущее: <white>" + (draft.icon() == null ? "—" : draft.icon()) + "</white>")));
+            lore.add(noItalic(Text.parse("<dark_gray>Клик: ник игрока или Base64")));
             im.lore(lore);
             icon.setItemMeta(im);
         }
@@ -179,24 +180,34 @@ public final class RpcGui {
         ItemStack it = new ItemStack(Material.BOOK);
         ItemMeta m = it.getItemMeta();
         if (m == null) return it;
-        m.displayName(Text.parse("<#ffda4a><b>Превью</b></#ffda4a>"));
+        m.displayName(noItalic(Text.parse("<#ffda4a><b>Превью</b></#ffda4a>")));
 
         String text = plugin.configs().gm().getString("preview_text", "Привет, путник.");
         String dn = draft.displayName() == null ? "" : draft.displayName();
         String style = draft.style() == null ? "" : draft.style();
-        Component nameLine = Text.parse(dn);
-        Component styleLine = Text.parse(style + text);
 
         List<Component> lore = new ArrayList<>();
-        lore.add(Component.empty());
-        lore.add(Text.parse("<dark_gray>Имя:"));
-        lore.add(nameLine);
-        lore.add(Component.empty());
-        lore.add(Text.parse("<dark_gray>Реплика:"));
-        lore.add(styleLine);
+        lore.add(noItalic(Component.empty()));
+        lore.add(noItalic(Text.parse("<dark_gray>Имя:")));
+        lore.add(noItalic(Text.parse(dn)));
+        lore.add(noItalic(Component.empty()));
+        lore.add(noItalic(Text.parse("<dark_gray>Реплика:")));
+        lore.add(noItalic(Text.parse(style + text)));
         m.lore(lore);
         it.setItemMeta(m);
         return it;
+    }
+
+    /**
+     * Wraps a component so it inherits italic=false unless the component (or a
+     * descendant) explicitly sets italic. Bukkit lore and item display names
+     * are italic by default; without this wrapper every line in the editor
+     * would render skewed even when the user's MM has no {@code <i>} tag.
+     */
+    private static Component noItalic(Component c) {
+        return Component.empty()
+                .decoration(TextDecoration.ITALIC, false)
+                .append(c);
     }
 
     private static String escape(String s) {
@@ -216,18 +227,18 @@ public final class RpcGui {
         ItemStack head = buildIcon(ch);
         ItemMeta meta = head.getItemMeta();
         if (meta != null) {
-            meta.displayName(Text.parse(ch.displayName()));
+            meta.displayName(noItalic(Text.parse(ch.displayName())));
             List<Component> lore = new ArrayList<>();
-            lore.add(Text.parse("<dark_gray>id: <white>" + ch.id() + "</white>"));
-            lore.add(Text.parse("<dark_gray>стиль: <white>" + escape(ch.style()) + "</white>"));
-            lore.add(Text.parse("<dark_gray>радиус: <white>" + ch.radius() + "</white>"));
-            lore.add(Component.empty());
+            lore.add(noItalic(Text.parse("<dark_gray>id: <white>" + ch.id() + "</white>")));
+            lore.add(noItalic(Text.parse("<dark_gray>стиль: <white>" + escape(ch.style()) + "</white>")));
+            lore.add(noItalic(Text.parse("<dark_gray>радиус: <white>" + ch.radius() + "</white>")));
+            lore.add(noItalic(Component.empty()));
             String text = plugin.configs().gm().getString("preview_text", "Привет, путник.");
             String style = ch.style() == null ? "" : ch.style();
-            lore.add(Text.parse(style + text));
-            lore.add(Component.empty());
-            lore.add(Text.parse("<#ffda4a>ЛКМ — редактировать"));
-            lore.add(Text.parse("<#ffda4a>ПКМ — удалить (Shift+ПКМ для подтверждения)"));
+            lore.add(noItalic(Text.parse(style + text)));
+            lore.add(noItalic(Component.empty()));
+            lore.add(noItalic(Text.parse("<#ffda4a>ЛКМ — редактировать")));
+            lore.add(noItalic(Text.parse("<#ffda4a>ПКМ — удалить (Shift+ПКМ для подтверждения)")));
             meta.lore(lore);
             head.setItemMeta(meta);
         }
@@ -273,9 +284,9 @@ public final class RpcGui {
         ItemStack it = new ItemStack(mat);
         ItemMeta m = it.getItemMeta();
         if (m != null) {
-            m.displayName(Text.parse(name));
+            m.displayName(noItalic(Text.parse(name)));
             List<Component> l = new ArrayList<>();
-            for (String s : lore) l.add(Text.parse(s));
+            for (String s : lore) l.add(noItalic(Text.parse(s)));
             m.lore(l);
             it.setItemMeta(m);
         }
