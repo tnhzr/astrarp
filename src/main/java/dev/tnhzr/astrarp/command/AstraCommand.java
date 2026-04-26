@@ -160,8 +160,16 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
         }
         java.util.Map<String, String> aliases = new java.util.LinkedHashMap<>();
         for (Player online : Bukkit.getOnlinePlayers()) {
-            plugin.names().get(online.getUniqueId()).ifPresent(rp ->
-                    aliases.put(rp.name(), online.getName()));
+            plugin.names().get(online.getUniqueId()).ifPresent(rp -> {
+                // Names may contain MiniMessage tags (e.g. "<gold>Гриффит</gold>"),
+                // but ChatHeads matches against the rendered plain text, so the
+                // alias key must be the post-MM-render string — otherwise the
+                // mod never finds the substring in the visible chat line.
+                String renderedName = Text.plain(Text.parse(rp.name()));
+                if (!renderedName.isEmpty()) {
+                    aliases.put(renderedName, online.getName());
+                }
+            });
         }
         sender.sendMessage(Component.text("AstraRP \u2192 ChatHeads aliases (" + aliases.size() + "):"));
         sender.sendMessage(Component.text("  Paste into config/chat_heads.json5 on the client:"));
