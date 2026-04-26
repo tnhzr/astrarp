@@ -72,21 +72,25 @@ public final class ConfigManager {
             }
         }
 
-        // v1.0.6 default ChatHeads suffix: " <#1a1a1a><i>({player})</i></#1a1a1a>".
-        // The italic suffix produced rendering glitches on servers running custom-
-        // font resource packs (CraftEngine / ItemsAdder), so v1.0.7+ ships with
-        // chatheads.enabled: false by default. Any user that hadn't customised
-        // either key gets flipped automatically; users with a custom format are
-        // left alone.
-        String currentSuffix = config.getString("chatheads.suffix_format");
-        boolean enabled = config.getBoolean("chatheads.enabled", false);
-        if (enabled && currentSuffix != null
-                && currentSuffix.equals(" <#1a1a1a><i>({player})</i></#1a1a1a>")) {
+        // ChatHeads suffix is one-shot disabled on the first launch of v1.0.7+.
+        // The previous default ({@code <i>(...)</i>} at very dark colour) broke
+        // chat on servers running custom-font resource packs (CraftEngine /
+        // ItemsAdder) because the per-player suffix has no glyphs in those
+        // override fonts and renders as missing-glyph boxes. We can't reliably
+        // detect "user really wanted this on" vs. "user just inherited the old
+        // default", so we flip {@code enabled} to false exactly once and write
+        // a marker key. Anyone who explicitly sets {@code enabled: true} after
+        // the marker is set keeps it on.
+        if (!config.getBoolean("chatheads.migrated_v107", false)) {
+            String currentSuffix = config.getString("chatheads.suffix_format");
+            if (currentSuffix != null && currentSuffix.contains("<i>") && currentSuffix.contains("({player})")) {
+                config.set("chatheads.suffix_format", " <#1a1a1a>({player})</#1a1a1a>");
+            }
             config.set("chatheads.enabled", false);
-            config.set("chatheads.suffix_format", " <#1a1a1a>({player})</#1a1a1a>");
+            config.set("chatheads.migrated_v107", true);
             try {
                 config.save(new File(plugin.getDataFolder(), "config.yml"));
-                plugin.getLogger().info("Migrated legacy ChatHeads suffix default \u2014 disabled, italic stripped.");
+                plugin.getLogger().info("Disabled ChatHeads suffix on upgrade to v1.0.7 \u2014 see /arp chatheads-aliases for the universal nameAliases path.");
             } catch (IOException ex) {
                 plugin.getLogger().warning("Failed to save migrated config.yml: " + ex.getMessage());
             }

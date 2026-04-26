@@ -5,6 +5,9 @@ import dev.tnhzr.astrarp.module.names.NamesModule;
 import dev.tnhzr.astrarp.module.status.StatusModule;
 import dev.tnhzr.astrarp.util.Text;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -14,6 +17,10 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -171,18 +178,58 @@ public final class AstraCommand implements CommandExecutor, TabCompleter {
                 }
             });
         }
-        sender.sendMessage(Component.text("AstraRP \u2192 ChatHeads aliases (" + aliases.size() + "):"));
-        sender.sendMessage(Component.text("  Paste into config/chat_heads.json5 on the client:"));
-        sender.sendMessage(Component.text("  \"nameAliases\": {"));
+
+        // Render the JSON snippet once, then both (a) write it to disk so the
+        // admin can grab it via FTP / a text editor, and (b) print it in chat
+        // with copy-to-clipboard click events so it can be copied without
+        // dragging through chat history.
+        StringBuilder json = new StringBuilder();
+        json.append("\"nameAliases\": {\n");
         int i = 0;
         for (java.util.Map.Entry<String, String> e : aliases.entrySet()) {
             String tail = (++i == aliases.size()) ? "" : ",";
-            // chat_heads.json5 stores aliases as { "<rendered text>": "<real username>" }
-            sender.sendMessage(Component.text("    \"" + escapeJson(e.getKey()) + "\": \""
-                    + escapeJson(e.getValue()) + "\"" + tail));
+            json.append("  \"").append(escapeJson(e.getKey())).append("\": \"")
+                    .append(escapeJson(e.getValue())).append("\"").append(tail).append('\n');
         }
-        sender.sendMessage(Component.text("  }"));
-        sender.sendMessage(Component.text("After pasting, restart the client (or run /chatheads reload)."));
+        json.append("}\n");
+        String jsonString = json.toString();
+
+        File outFile = new File(plugin.getDataFolder(), "chatheads_aliases.json5");
+        try {
+            Files.writeString(outFile.toPath(), jsonString, StandardCharsets.UTF_8);
+        } catch (IOException ex) {
+            sender.sendMessage(Component.text("WARN: cannot write " + outFile.getName() + ": "
+                    + ex.getMessage(), NamedTextColor.YELLOW));
+        }
+
+        sender.sendMessage(Component.text("AstraRP \u2192 ChatHeads aliases (" + aliases.size() + "):"));
+        Component fileLine = Component.text("  File: ", NamedTextColor.GRAY)
+                .append(Component.text(outFile.getAbsolutePath(), NamedTextColor.WHITE));
+        sender.sendMessage(fileLine);
+        // Single clickable copy line: clicking it copies the entire JSON snippet
+        // to the player's clipboard. ClickEvent.copyToClipboard requires Paper
+        // 1.15+ which is well below our 1.21.8 floor.
+        Component copyLine = Component.text("  [ Copy full JSON to clipboard ]", NamedTextColor.GOLD)
+                .clickEvent(ClickEvent.copyToClipboard(jsonString))
+                .hoverEvent(HoverEvent.showText(Component.text("Click to copy:\n" + jsonString,
+                        NamedTextColor.GRAY)));
+        sender.sendMessage(copyLine);
+        sender.sendMessage(Component.text("  Then paste into ~/.minecraft/config/chat_heads.json5 ",
+                NamedTextColor.GRAY)
+                .append(Component.text("(replace the existing nameAliases block)",
+                        NamedTextColor.DARK_GRAY)));
+
+        // Also print line by line for visual confirmation; each line is
+        // independently clickable so console operators (where ClickEvent is
+        // a no-op) still see the content for manual copy.
+        sender.sendMessage(Component.text("  ──── snippet ────", NamedTextColor.DARK_GRAY));
+        for (String line : jsonString.split("\n")) {
+            Component clickable = Component.text("  " + line, NamedTextColor.WHITE)
+                    .clickEvent(ClickEvent.copyToClipboard(line))
+                    .hoverEvent(HoverEvent.showText(Component.text("Click to copy this line",
+                            NamedTextColor.GRAY)));
+            sender.sendMessage(clickable);
+        }
     }
 
     /**
