@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [1.0.6] — 2026-04-25
+## [1.0.7] — 2026-04-26
 
 ### Removed
 
@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
   (CraftEngine / ItemsAdder) надёжного пути не нашлось. При старте
   плагин автоматически вычищает старый блок `chatheads:` из
   `config.yml`, чтобы файл не нёс мёртвых ключей.
+
+## [1.0.6] — 2026-04-25 (без публичного релиза, объединено в 1.0.7)
 
 ### Changed
 
